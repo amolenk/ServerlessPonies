@@ -1,0 +1,22 @@
+
+POST http://localhost:7071/api/negotiate
+
+###
+
+POST http://localhost:7071/api/StartGame 
+content-type: application/json
+
+{
+    "Id": "1232",
+    "Name": "Lisa"
+}
+
+###
+
+POST http://localhost:7071/api/events/123 
+content-type: application/json
+
+{
+    "Id": "1232",
+    "Name": "Lisa"
+}

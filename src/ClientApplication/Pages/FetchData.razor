@@ -1,55 +1,55 @@
 ﻿@page "/fetchdata"
-@inject HttpClient Http
+@inject IJSRuntime jsRuntime
+@using Blazor.Extensions
+@using Newtonsoft.Json
+@using ClientApplication
 
-<h1>Weather forecast</h1>
-
-<p>This component demonstrates fetching data from the server.</p>
-
-@if (forecasts == null)
-{
-    <p><em>Loading...</em></p>
-}
-else
-{
-    <table class="table">
-        <thead>
-            <tr>
-                <th>Date</th>
-                <th>Temp. (C)</th>
-                <th>Temp. (F)</th>
-                <th>Summary</th>
-            </tr>
-        </thead>
-        <tbody>
-            @foreach (var forecast in forecasts)
-            {
-                <tr>
-                    <td>@forecast.Date.ToShortDateString()</td>
-                    <td>@forecast.TemperatureC</td>
-                    <td>@forecast.TemperatureF</td>
-                    <td>@forecast.Summary</td>
-                </tr>
-            }
-        </tbody>
-    </table>
-}
+<h1>SignalR test</h1>
 
 @code {
-    private WeatherForecast[] forecasts;
+
+    [Inject]
+    private HttpClient _httpClient { get; set; }
+
+    [Inject]
+    private HubConnectionBuilder _hubConnectionBuilder { get; set; }
+
+    SignalRClient client = null;
 
     protected override async Task OnInitializedAsync()
     {
-        forecasts = await Http.GetJsonAsync<WeatherForecast[]>("sample-data/weather.json");
+//        var connectionInfo = await GetSignalRConnectionInfoAsync();
+
+        try
+        {
+            client = new SignalRClient("Joe", jsRuntime);
+            client.MessageReceived += MessageReceived;
+            await client.Start("http://localhost:7071/api");
+        }
+        catch (Exception e)
+        {
+            var message = $"ERROR: Failed to start chat client: {e.Message}";
+            Console.WriteLine(e.Message);
+            Console.WriteLine(e.StackTrace);
+        }
+            }
+
+/*    protected async Task<SignalRConnectionInfo> GetSignalRConnectionInfoAsync()
+    {
+        var response = await _httpClient.PostAsync("http://localhost:7071/api/negotiate", null);
+        response.EnsureSuccessStatusCode();
+        var json = await response.Content.ReadAsStringAsync();
+        return JsonConvert.DeserializeObject<SignalRConnectionInfo>(json);
+    }*/
+
+    void MessageReceived(object sender, MessageReceivedEventArgs e)
+    {
+        Console.WriteLine($"Blazor: receive {e.Username}: {e.Message}");
     }
 
-    public class WeatherForecast
+    private Task Handle(object msg)
     {
-        public DateTime Date { get; set; }
-
-        public int TemperatureC { get; set; }
-
-        public string Summary { get; set; }
-
-        public int TemperatureF => 32 + (int)(TemperatureC / 0.5556);
+        Console.WriteLine(msg);
+        return Task.CompletedTask;
     }
 }

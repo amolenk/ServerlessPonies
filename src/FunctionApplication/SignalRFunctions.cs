@@ -21,9 +21,8 @@ namespace Amolenk.ServerlessPonies.FunctionApplication
 
         [FunctionName("events")]
         public static Task PublishEvent(
-            [HttpTrigger(AuthorizationLevel.Anonymous, "post", Route = "events/{id}")] object payload,
-            [SignalR(HubName = "ponies")] IAsyncCollector<SignalRMessage> signalRMessages,
-            string id)
+            [HttpTrigger(AuthorizationLevel.Anonymous, "post", Route = "events")] object payload,
+            [SignalR(HubName = "ponies")] IAsyncCollector<SignalRMessage> signalRMessages)
         {
             return signalRMessages.AddAsync(
                 new SignalRMessage

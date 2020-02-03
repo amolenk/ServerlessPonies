@@ -1,7 +1,62 @@
 ﻿@page "/"
+@using ClientApplication.Scenes;
+@using Blazor.Extensions
+@using Newtonsoft.Json
+@using Newtonsoft.Json.Linq
+@inject IJSRuntime JSRuntime;
+@inject HttpClient HttpClient;
+@inject IServiceProvider ServiceProvider;
+@inject IPhaserInterop Phaser;
+@using Amolenk.ServerlessPonies.Messages;
 
-<h1>Hello, world!</h1>
+<h1>@Title</h1>
 
-Welcome to your new app.
+<div id="phaser-container"></div>
 
-<SurveyPrompt Title="How is Blazor working for you?" />
+@code {
+
+    const string Title = "Serverless Ponies BETA 🐴";
+
+    [Inject]
+    private HubConnectionBuilder _hubConnectionBuilder { get; set; }
+
+    SignalRClient client = null;
+
+    PhaserGame game;
+
+    protected override async Task OnInitializedAsync()
+    {
+        try
+        {
+            client = new SignalRClient("Joe", JSRuntime);
+            client.MessageReceived += MessageReceived;
+            await client.Start("http://localhost:7071/api");
+        }
+        catch (Exception e)
+        {
+            var message = $"ERROR: Failed to start chat client: {e.Message}";
+            Console.WriteLine(e.Message);
+            Console.WriteLine(e.StackTrace);
+        }
+
+        game = new PhaserGameBuilder(Phaser, ServiceProvider)
+            .WithScene<RanchScene>()
+            .WithScene<AnimalCareScene>()
+            .WithScene<AnimalManagementScene>()
+            .WithScene<SpinnerScene>()
+            .WithState(GameState.NewGame()) // TODO Load state from Azure Function
+            .Build();
+
+        game.Start("phaser-container", Title);
+    }
+
+    void MessageReceived(object sender, MessageReceivedEventArgs e)
+    {
+        var json = JObject.Parse(e.Message);
+        var eventTypeName = $"Amolenk.ServerlessPonies.Messages.{json["Type"].Value<string>()},Messages";
+        var eventType = Type.GetType(eventTypeName);
+        var @event = json["Payload"].ToObject(eventType);
+
+        game.HandleEvent(@event);
+    }
+}

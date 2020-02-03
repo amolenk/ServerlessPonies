@@ -13,10 +13,21 @@ content-type: application/json
 
 ###
 
-POST http://localhost:7071/api/events/123 
+POST http://localhost:7071/api/events/ 
 content-type: application/json
 
 {
     "Id": "1232",
     "Name": "Lisa"
+}
+
+###
+
+POST http://localhost:7071/api/BuyAnimal 
+content-type: application/json
+
+{
+    "PlayerId": "player",
+    "AnimalId": "AnimalId",
+    "EnclosureId": "EnclosureId"
 }

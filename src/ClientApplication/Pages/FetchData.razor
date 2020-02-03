@@ -18,8 +18,6 @@
 
     protected override async Task OnInitializedAsync()
     {
-//        var connectionInfo = await GetSignalRConnectionInfoAsync();
-
         try
         {
             client = new SignalRClient("Joe", jsRuntime);

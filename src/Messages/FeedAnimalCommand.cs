@@ -1,0 +1,11 @@
+﻿using System;
+
+namespace Amolenk.ServerlessPonies.Messages
+{
+    public class FeedAnimalCommand
+    {
+        //public string PlayerId { get; set; }
+
+        public string AnimalId { get; set; }
+    }
+}

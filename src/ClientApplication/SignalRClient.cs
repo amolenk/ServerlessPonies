@@ -30,19 +30,18 @@ namespace ClientApplication
         /// <param name="username"></param>
         /// <param name="message"></param>
         /// <remarks>
-        /// This method is called from Javascript when amessage is received
+        /// This method is called from Javascript when a message is received
         /// </remarks>
         [JSInvokable]
         public static void ReceiveMessage(string key, string method, string username, object message)
         {
-            Console.WriteLine(message);
             // if (_clients.ContainsKey(key))
             // {
             //     var client = _clients[key];
             //     switch (method)
             //     {
             //         case "ReceiveMessage":
-            //             client.HandleReceiveMessage(username, message);
+            _clients.First().Value.HandleReceiveMessage(username, message.ToString());
             //             return;
 
             //         default:

@@ -28,6 +28,9 @@ window.ChatClient = {
 
         // create an inbound message handler for the "ReceiveMessage" event
         connection.on("newMessage", (message) => {
+
+            //console.log('Got a message!!!');
+
             //console.log("Connection message received for " + key + " from " + username);
             // invoke Blazor dotnet method 
             // we pass the key in so we know which client received the message

@@ -1,2 +1,19 @@
+# Visual Studio
+.vs
 
+# Visual Studio Code
+.vscode
+.ionide
+
+# Output and build files.
+bin/
+obj/
+build/
+out/
+puml_out/
+
+# User files
 .DS_Store
+*.csproj.user
+launchSettings.json
+/src/TestResults

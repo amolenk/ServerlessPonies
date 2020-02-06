@@ -1,13 +1,14 @@
 ﻿@page "/"
-@using ClientApplication.Scenes;
 @using Blazor.Extensions
 @using Newtonsoft.Json
 @using Newtonsoft.Json.Linq
+@using Amolenk.ServerlessPonies.Messages;
+@using Amolenk.ServerlessPonies.ClientApplication.Phaser
+@using Amolenk.ServerlessPonies.ClientApplication.Scenes
 @inject IJSRuntime JSRuntime;
 @inject HttpClient HttpClient;
 @inject IServiceProvider ServiceProvider;
 @inject IPhaserInterop Phaser;
-@using Amolenk.ServerlessPonies.Messages;
 
 <h1>@Title</h1>
 

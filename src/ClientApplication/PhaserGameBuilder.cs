@@ -1,6 +1,8 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using Amolenk.ServerlessPonies.ClientApplication.Phaser;
+using Amolenk.ServerlessPonies.ClientApplication.Scenes;
 
 namespace ClientApplication
 {

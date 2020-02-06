@@ -8,14 +8,34 @@ function findSprite(sceneName, spriteName) {
     });
 }
 
-function addHandler(sceneName, spriteName, handlerName) {
+// function addHandler(sceneName, spriteName, handlerName) {
+//     const sprite = findSprite(sceneName, spriteName);
+
+//     sprite.setInteractive({ pixelPerfect: true });
+
+//     sprite.on('pointerup', (pointer, gameObject, event) => {
+//         const sceneInfo = sceneInfos[sceneName];
+//         sceneInfo.dotNetScene.invokeMethodAsync(handlerName, spriteName);
+//     });
+// }
+
+function addSpriteEventHandler(sceneName, spriteName, eventName, handlerName) {
     const sprite = findSprite(sceneName, spriteName);
-
     sprite.setInteractive({ pixelPerfect: true });
-
-    sprite.on('pointerup', (pointer, gameObject, event) => {
+    sprite.on(eventName, (pointer) => {
         const sceneInfo = sceneInfos[sceneName];
-        sceneInfo.dotNetScene.invokeMethodAsync(handlerName, spriteName);
+        const eventArgs = { 'spriteName': spriteName, 'x': pointer.x, 'y': pointer.y, 'distance': -1 };
+//        if (pointer.distance) eventArgs.distance = pointer.distance;
+        sceneInfo.dotNetScene.invokeMethodAsync(handlerName, eventArgs);
+    });
+}
+
+function addSceneEventHandler(sceneName, eventName, handlerName) {
+    const sceneInfo = sceneInfos[sceneName];
+    sceneInfo.phaserScene.input.on(eventName, (pointer) => {
+        const eventArgs = { 'x': pointer.x, 'y': pointer.y, 'distance': -1 };
+        //if (pointer.distance) eventArgs.distance = pointer.distance;
+        sceneInfo.dotNetScene.invokeMethod(handlerName, eventArgs);
     });
 }
 
@@ -29,6 +49,12 @@ function setSpriteScale(sceneName, spriteName, scale) {
     sprite.scale = scale;
 }
 
+function setSpriteLocation(sceneName, spriteName, x, y) {
+    const sprite = findSprite(sceneName, spriteName);
+    sprite.x = x;
+    sprite.y = y;
+}
+
 function getSpriteData(sceneName, spriteName, key) {
     const sprite = findSprite(sceneName, spriteName);
     return sprite.getData(key);
@@ -40,7 +66,6 @@ function setSpriteData(sceneName, spriteName, key, value) {
 }
 
 function addSprite(sceneName, spriteName, imageName, x, y, scale = null, interactive = false) {
-
     const sceneInfo = sceneInfos[sceneName];
     const sprite = sceneInfo.phaserScene.add.sprite(x, y, imageName);
     sprite.name = spriteName; // TODO Use same strategy for scenes.
@@ -48,7 +73,13 @@ function addSprite(sceneName, spriteName, imageName, x, y, scale = null, interac
     if (scale) {
         sprite.setScale(scale);
     }
+}
 
+function removeSprite(sceneName, spriteName) {
+    const sprite = findSprite(sceneName, spriteName);
+    if (sprite) {
+        sprite.destroy();
+    }
 }
 
 function addRectangle(sceneName, x, y, width, height, color) {
@@ -59,15 +90,6 @@ function addRectangle(sceneName, x, y, width, height, color) {
     var rect = new Phaser.Geom.Rectangle(x, y, width, height);
 
     graphics.fillRectShape(rect);
-}
-
-function removeSprite(sceneName, spriteName) {
-
-    const scene = scenes[sceneName];
-    const sprite = scene.children.list.find(child => { // TODO Extract to function
-        return child.type === "Sprite" && child.name === spriteName
-    });
-    sprite.destroy();
 }
 
 function switchScene(from, to) {

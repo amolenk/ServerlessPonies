@@ -1,5 +1,6 @@
+using Amolenk.ServerlessPonies.ClientApplication.Phaser;
+using Amolenk.ServerlessPonies.ClientApplication.Scenes;
 using Blazor.Extensions;
-using ClientApplication.Scenes;
 using Microsoft.AspNetCore.Components.Builder;
 using Microsoft.Extensions.DependencyInjection;
 
@@ -12,7 +13,7 @@ namespace ClientApplication
             // Use Blazor Extensions to wrap the SignalR Typescript client.
             // https://github.com/BlazorExtensions/SignalR
             services.AddTransient<HubConnectionBuilder>();
-            services.AddTransient<IPhaserInterop, PhaserClient>();
+            services.AddTransient<IPhaserInterop, PhaserInterop>();
             services.AddTransient<ApiClient>(); // TODO Refit?
             services
                 .AddTransient<RanchScene>()

@@ -5,7 +5,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace ClientApplication.Scenes
+namespace Amolenk.ServerlessPonies.ClientApplication.Scenes
 {
     public class SpinnerScene : Scene
     {
@@ -16,8 +16,7 @@ namespace ClientApplication.Scenes
         [JSInvokable("create")]
         public override void Create()
         {
-            Phaser(interop => interop
-                .AddSprite("spinner", "logo", 400, 300));
+            Phaser(interop => interop.AddSprite("spinner", "logo", 400, 300));
         }
     }
 }

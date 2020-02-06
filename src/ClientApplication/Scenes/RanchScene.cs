@@ -1,4 +1,6 @@
+using Amolenk.ServerlessPonies.ClientApplication.Phaser;
 using Amolenk.ServerlessPonies.Messages;
+using ClientApplication;
 using Microsoft.JSInterop;
 using System;
 using System.Collections.Generic;
@@ -6,7 +8,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace ClientApplication.Scenes
+namespace Amolenk.ServerlessPonies.ClientApplication.Scenes
 {
     public class RanchScene : Scene,
         IEventHandler<AnimalPlacedEvent>,
@@ -22,23 +24,25 @@ namespace ClientApplication.Scenes
             Phaser(interop =>
             {
                 interop
-                    .AddSprite("world", "world", 400, 300, 0.2)
-                    .AddSprite("button", "brush", 100, 125, 0.2)
-                    .OnPointerUp("button", nameof(Button_PointerUp));
+                    .AddSprite("world", "world", 400, 300, options => options.Scale(0.2))
+                    .AddSprite("button", "brush", 100, 125, options => options
+                        .Scale(0.2)                    
+                        .OnPointerUp(nameof(Button_PointerUp)));
 
                 foreach (var enclosure in State.Enclosures.Where(enclosure => enclosure.AnimalId != null))
                 {
                     var animalSpriteName = SpriteName.Create("animal", enclosure.AnimalId);
                     
                     interop
-                        .AddSprite(animalSpriteName, "logo", 320, 80, 0.2)
-                        .OnPointerUp(animalSpriteName, nameof(Animal_PointerUp));
+                        .AddSprite(animalSpriteName, "logo", 320, 80, options => options
+                            .Scale(0.2)
+                            .OnPointerUp(nameof(Animal_PointerUp)));
                 }
             });
         }
 
         [JSInvokable]
-        public Task Button_PointerUp(string spriteName)
+        public Task Button_PointerUp(SpritePointerEventArgs e)
         {
             State.SelectedEnclosureId = "1";
 
@@ -48,7 +52,7 @@ namespace ClientApplication.Scenes
         }
 
         [JSInvokable]
-        public Task Animal_PointerUp(string spriteName)
+        public Task Animal_PointerUp(SpritePointerEventArgs e)
         {
 //            State.SelectedEnclosureId = "1";
 

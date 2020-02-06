@@ -1,9 +1,10 @@
 using Amolenk.ServerlessPonies.Messages;
+using ClientApplication;
 using Microsoft.JSInterop;
 using System;
 using System.Threading.Tasks;
 
-namespace ClientApplication.Scenes
+namespace Amolenk.ServerlessPonies.ClientApplication.Scenes
 {
     public class AnimalManagementScene : Scene,
         IEventHandler<AnimalPlacedEvent>
@@ -28,13 +29,14 @@ namespace ClientApplication.Scenes
                 var spriteName = SpriteName.Create("animal", animal.Id);
 
                 Phaser(interop => interop
-                    .AddSprite(spriteName, "logo", 200 + (index++ * 150), 300, 0.3)
-                    .OnPointerUp(spriteName, nameof(Animal_PointerUp)));
+                    .AddSprite(spriteName, "logo", 200 + (index++ * 150), 300, options => options
+                    .Scale(0.3)
+                    .OnPointerUp(nameof(Animal_PointerUp))));
             }
         }
 
         [JSInvokable]
-        public async Task Animal_PointerUp(string spriteName)
+        public async Task Animal_PointerUp(string spriteName, int x, int y)
         {
             var animalId = SpriteName.ExtractId(spriteName);
 

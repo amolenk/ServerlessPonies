@@ -1,12 +1,8 @@
-using ClientApplication.Scenes;
-using Microsoft.JSInterop;
+using Amolenk.ServerlessPonies.ClientApplication.Phaser;
+using ClientApplication;
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
-namespace ClientApplication
+namespace Amolenk.ServerlessPonies.ClientApplication.Scenes
 {
     public abstract class Scene
     {
@@ -31,7 +27,7 @@ namespace ClientApplication
 
         protected void Phaser(Action<IPhaserSceneInterop> interop)
         {
-            interop(_phaser.InScene(this));
+            interop(_phaser.Scene(this));
         }
 
         public abstract string GetName();

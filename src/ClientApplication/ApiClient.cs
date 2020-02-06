@@ -1,5 +1,4 @@
 using Amolenk.ServerlessPonies.Messages;
-using ClientApplication.Scenes;
 using Microsoft.JSInterop;
 using System;
 using System.Collections.Generic;

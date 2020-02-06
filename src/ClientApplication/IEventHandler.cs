@@ -1,4 +1,4 @@
-using ClientApplication.Scenes;
+using Amolenk.ServerlessPonies.ClientApplication.Phaser;
 using Microsoft.JSInterop;
 using System;
 using System.Collections.Generic;

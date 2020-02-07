@@ -48,7 +48,7 @@ namespace Amolenk.ServerlessPonies.FunctionApplication.Entities
             ThirstinessLevel = new MoodLevel { Value = 1 };
             HappinessLevel = new MoodLevel { Value = 1 };
 
-            ScheduleNextMoodChange(15);
+            //ScheduleNextMoodChange(15);
 
             return Task.CompletedTask;
         }

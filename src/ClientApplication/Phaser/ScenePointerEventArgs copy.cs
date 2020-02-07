@@ -14,6 +14,6 @@ namespace Amolenk.ServerlessPonies.ClientApplication.Phaser
 
         public int Y { get; set; }
 
-        public int Distance { get; set; }
+        public double Distance { get; set; }
     }
 }

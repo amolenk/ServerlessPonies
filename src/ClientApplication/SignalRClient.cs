@@ -33,7 +33,7 @@ namespace ClientApplication
         /// This method is called from Javascript when a message is received
         /// </remarks>
         [JSInvokable]
-        public static void ReceiveMessage(string key, string method, string username, object message)
+        public static void HandleEvent(string eventName, object eventPayload)
         {
             // if (_clients.ContainsKey(key))
             // {
@@ -41,7 +41,7 @@ namespace ClientApplication
             //     switch (method)
             //     {
             //         case "ReceiveMessage":
-            _clients.First().Value.HandleReceiveMessage(username, message.ToString());
+            _clients.First().Value.HandleReceiveMessage(eventName, eventPayload.ToString());
             //             return;
 
             //         default:
@@ -61,13 +61,13 @@ namespace ClientApplication
         /// Ctor: create a new client for the given hub URL
         /// </summary>
         /// <param name="hubUrl"></param>
-        public SignalRClient(string username, IJSRuntime JSRuntime)
+        public SignalRClient(IJSRuntime JSRuntime)
         {
             _JSruntime = JSRuntime;
             // save username
-            if (string.IsNullOrWhiteSpace(username))
-                throw new ArgumentNullException(nameof(username));
-            _username = username;
+            // if (string.IsNullOrWhiteSpace(username))
+            //     throw new ArgumentNullException(nameof(username));
+            _username = "username";
             // create a unique key for this client
             _key = Guid.NewGuid().ToString();
             // add to the list of clients
@@ -145,10 +145,10 @@ namespace ClientApplication
         /// </summary>
         /// <param name="method">event name</param>
         /// <param name="message">message content</param>
-        private void HandleReceiveMessage(string username, string message)
+        private void HandleReceiveMessage(string eventName, string eventPayload)
         {
             // raise an event to subscribers
-            MessageReceived?.Invoke(this, new MessageReceivedEventArgs(username, message));
+            EventReceived?.Invoke(eventName, eventPayload);
         }
 
         /// <summary>
@@ -157,7 +157,7 @@ namespace ClientApplication
         /// <remarks>
         /// Instance classes should subscribe to this event
         /// </remarks>
-        public event MessageReceivedEventHandler MessageReceived;
+        public event SignalREventHandler EventReceived;
 
         /// <summary>
         /// Send a message to the hub
@@ -211,7 +211,7 @@ namespace ClientApplication
     /// </summary>
     /// <param name="sender">the SignalRclient instance</param>
     /// <param name="e">Event args</param>
-    public delegate void MessageReceivedEventHandler(object sender, MessageReceivedEventArgs e);
+    public delegate void SignalREventHandler(string eventName, string eventPayload);
 
     /// <summary>
     /// Message received argument class

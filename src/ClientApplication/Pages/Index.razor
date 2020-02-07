@@ -27,11 +27,14 @@
 
     protected override async Task OnInitializedAsync()
     {
+        var playerName = "Lisa";
+
         try
         {
-            client = new SignalRClient("Joe", JSRuntime);
-            client.MessageReceived += MessageReceived;
-            await client.Start("http://localhost:7071/api");
+            // TODO Register with IoC
+            client = new SignalRClient(JSRuntime);
+            client.EventReceived += HandleEvent;
+            await client.Start($"http://localhost:7071/api/signalr/{playerName}");
         }
         catch (Exception e)
         {
@@ -41,22 +44,28 @@
         }
 
         game = new PhaserGameBuilder(Phaser, ServiceProvider)
+            .WithPlayerName(playerName)
+            .WithScene<BootScene>()
             .WithScene<RanchScene>()
             .WithScene<AnimalCareScene>()
             .WithScene<AnimalManagementScene>()
             .WithScene<SpinnerScene>()
-            .WithState(GameState.NewGame()) // TODO Load state from Azure Function
             .Build();
 
         game.Start("phaser-container", Title);
+
+        await new ApiClient(HttpClient).StartSinglePlayerGame(Guid.NewGuid().ToString("N"), playerName);
     }
 
-    void MessageReceived(object sender, MessageReceivedEventArgs e)
+    void HandleEvent(string eventName, string eventPayload)
     {
-        var json = JObject.Parse(e.Message);
-        var eventTypeName = $"Amolenk.ServerlessPonies.Messages.{json["Type"].Value<string>()},Messages";
+        // TODO Use logger
+        Console.WriteLine($"Received '{eventName}' event: {eventPayload}");
+
+        var eventTypeName = $"Amolenk.ServerlessPonies.Messages.{eventName},Messages";
         var eventType = Type.GetType(eventTypeName);
-        var @event = json["Payload"].ToObject(eventType);
+
+        var @event = JsonConvert.DeserializeObject(eventPayload, eventType);
 
         game.HandleEvent(@event);
     }

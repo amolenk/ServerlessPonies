@@ -19,6 +19,9 @@ namespace Amolenk.ServerlessPonies.ClientApplication.Phaser
             _scene = scene;
         }
 
+        public bool IsVisible()
+            => _jsRuntime.Invoke<bool>("isSceneVisible", _scene.GetName());
+
         public IPhaserSceneInterop AddSprite(string name, string imageName, int x, int y, Action<IPhaserSpriteInterop> options)
         {
             _jsRuntime.InvokeVoid("addSprite", _scene.GetName(), name, imageName, x, y, 1);

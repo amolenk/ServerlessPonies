@@ -10,6 +10,8 @@ namespace Amolenk.ServerlessPonies.ClientApplication.Phaser
 {
     public interface IPhaserSceneInterop
     {
+        bool IsVisible();
+
         IPhaserSceneInterop AddSprite(string name, string imageName, int x, int y, Action<IPhaserSpriteInterop> options = null);
 
         IPhaserSceneInterop RemoveSprite(string name);

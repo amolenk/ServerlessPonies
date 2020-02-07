@@ -16,6 +16,7 @@ namespace ClientApplication
             services.AddTransient<IPhaserInterop, PhaserInterop>();
             services.AddTransient<ApiClient>(); // TODO Refit?
             services
+                .AddTransient<BootScene>()
                 .AddTransient<RanchScene>()
                 .AddTransient<AnimalManagementScene>()
                 .AddTransient<AnimalCareScene>()

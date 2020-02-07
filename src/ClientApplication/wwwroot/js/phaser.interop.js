@@ -8,24 +8,13 @@ function findSprite(sceneName, spriteName) {
     });
 }
 
-// function addHandler(sceneName, spriteName, handlerName) {
-//     const sprite = findSprite(sceneName, spriteName);
-
-//     sprite.setInteractive({ pixelPerfect: true });
-
-//     sprite.on('pointerup', (pointer, gameObject, event) => {
-//         const sceneInfo = sceneInfos[sceneName];
-//         sceneInfo.dotNetScene.invokeMethodAsync(handlerName, spriteName);
-//     });
-// }
-
 function addSpriteEventHandler(sceneName, spriteName, eventName, handlerName) {
     const sprite = findSprite(sceneName, spriteName);
     sprite.setInteractive({ pixelPerfect: true });
     sprite.on(eventName, (pointer) => {
         const sceneInfo = sceneInfos[sceneName];
         const eventArgs = { 'spriteName': spriteName, 'x': pointer.x, 'y': pointer.y, 'distance': -1 };
-//        if (pointer.distance) eventArgs.distance = pointer.distance;
+        if (pointer.distance) eventArgs.distance = pointer.distance;
         sceneInfo.dotNetScene.invokeMethodAsync(handlerName, eventArgs);
     });
 }
@@ -92,6 +81,10 @@ function addRectangle(sceneName, x, y, width, height, color) {
     graphics.fillRectShape(rect);
 }
 
+function isSceneVisible(scene) {
+    return game.scene.isVisible(scene);
+}
+
 function switchScene(from, to) {
     game.scene.stop(from);
     game.scene.start(to);
@@ -145,92 +138,3 @@ function startPhaser(container, title) {
       
       game = new Phaser.Game(config);
 }
-
-
-
-
-// this.horse = this.add.sprite(400, 400, 'horse');
-// this.horse.setInteractive({ pixelPerfect: true });
-// this.horse.inputEnabled = true;
-// this.horse.input.pixelPerfectOver = true;
-// // this.horse.input.useHandCursor = true;
-// this.horse.setScale(1);
-
-// //    this.input.enableDebug(this.horse, 0xff00ff);
-
-// this.brush = this.add.sprite(40, 40, 'brush');
-// this.brush.setInteractive();
-// this.brush.setScale(0.1);
-
-// //    this.brushCursor = this.add.sprite(100, 100, 'brush');
-// //    this.brushCursor.setScale(0.15);    
-
-
-// //    this.input.setDraggable(this.brush);
-
-// var particles = this.add.particles('brush');
-
-// this.emitter = particles.createEmitter({
-//     x: 0,
-//     y: 0,
-//     lifespan: 3000,
-//     scale: 0.1,
-//     speed: { min: 10, max: 30 },
-//     frequency: 250,
-//     on: false,
-//     angle: -45,
-//     gravityY: 300
-// });
-
-// let brushing = false;
-// const self = this;
-// this.delta = 0;
-
-// // particle fireworks: https://phaser.io/examples/v3/view/game-objects/particle-emitter/fireworks
-
-// let activityPoints = 0;
-
-// this.brush.on('pointerdown', (pointer, localX, localY, event) => {
-//     console.log("brush:pointerdown");
-//     this.brushing = true;
-
-//     this.brushCursor = self.add.sprite(40, 40, 'brush');
-//     this.brushCursor.setScale(0.15);    
-// });
-
-// this.horse.on('pointermove', (pointer, localX, localY, event) => {
-//     if (self.brushCursor && pointer.distance > 100) {
-//         activityPoints += 1;
-//         console.log(activityPoints);
-//         if (activityPoints % 25 == 0) {
-//             console.log('happy horsey!');
-//         }
-//     }
-// });
-
-// this.horse.on('pointerover', (pointer, localX, localY, event) => {
-//     if (this.brushCursor) {
-//         this.emitter.startFollow(this.brushCursor);
-//         this.emitter.on = true;    
-//     }
-// });
-
-// this.horse.on('pointerout', function (pointer, event) {
-//     if (this.brushCursor) {
-//         this.emitter.on = false;    
-//     }
-// });
-
-// this.input.on('pointermove', function (pointer, gameObject, event) {
-//     if (self.brushCursor) {
-//         self.brushCursor.x = pointer.x;
-//         self.brushCursor.y = pointer.y;
-//     }
-// });
-
-// this.input.on('pointerup', (pointer, gameObject, event) => {
-//     if (self.brushCursor) {
-//         self.brushCursor.destroy();
-//         activityPoints = 0;
-//     }
-// });

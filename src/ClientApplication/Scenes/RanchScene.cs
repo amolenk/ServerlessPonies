@@ -2,6 +2,7 @@ using Amolenk.ServerlessPonies.ClientApplication.Phaser;
 using Amolenk.ServerlessPonies.Messages;
 using ClientApplication;
 using Microsoft.JSInterop;
+using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -11,7 +12,7 @@ using System.Threading.Tasks;
 namespace Amolenk.ServerlessPonies.ClientApplication.Scenes
 {
     public class RanchScene : Scene,
-        IEventHandler<AnimalPlacedEvent>,
+        IEventHandler<AnimalMovedEvent>,
         IEventHandler<AnimalMoodChangedEvent>
     {
         public const string Name = "Ranch";
@@ -29,14 +30,9 @@ namespace Amolenk.ServerlessPonies.ClientApplication.Scenes
                         .Scale(0.2)                    
                         .OnPointerUp(nameof(Button_PointerUp)));
 
-                foreach (var enclosure in State.Enclosures.Where(enclosure => enclosure.AnimalId != null))
+                foreach (var animal in State.Animals.Where(animal => animal.EnclosureName != null))
                 {
-                    var animalSpriteName = SpriteName.Create("animal", enclosure.AnimalId);
-                    
-                    interop
-                        .AddSprite(animalSpriteName, "logo", 320, 80, options => options
-                            .Scale(0.2)
-                            .OnPointerUp(nameof(Animal_PointerUp)));
+                    AddAnimalSprite(animal);
                 }
             });
         }
@@ -44,7 +40,7 @@ namespace Amolenk.ServerlessPonies.ClientApplication.Scenes
         [JSInvokable]
         public Task Button_PointerUp(SpritePointerEventArgs e)
         {
-            State.SelectedEnclosureId = "1";
+            State.SelectedEnclosureName = "1";
 
             Phaser(interop => interop.SwitchToScene(AnimalManagementScene.Name));
 
@@ -61,10 +57,15 @@ namespace Amolenk.ServerlessPonies.ClientApplication.Scenes
             return Task.CompletedTask;
         }
 
-        public void Handle(AnimalPlacedEvent @event)
+        public void Handle(AnimalMovedEvent @event)
         {
-            var enclosure = State.Enclosures.Find(enclosure => enclosure.Id == @event.EnclosureId);
-            enclosure.AnimalId = @event.AnimalId;
+            var animal = State.Animals.Find(animal => animal.Name == @event.AnimalName);
+            if (animal != null)
+            {
+                animal.EnclosureName = @event.EnclosureName;
+
+                AddAnimalSprite(animal);
+            }
         }
 
         public void Handle(AnimalMoodChangedEvent @event)
@@ -74,6 +75,19 @@ namespace Amolenk.ServerlessPonies.ClientApplication.Scenes
             // TODO Update on screen.
 
             Console.WriteLine($"Animal mood changed: [happiness: {@event.HappinessLevel}] [hungriness: {@event.HungrinessLevel}] [thirstiness: {@event.ThirstinessLevel}]");
+        }
+
+        private void AddAnimalSprite(Animal animal)
+        {
+            Phaser(interop =>
+            {
+                 var animalSpriteName = SpriteName.Create("animal", animal.Name);
+
+                interop
+                    .AddSprite(animalSpriteName, "logo", 320, 80, options => options
+                        .Scale(0.2)
+                        .OnPointerUp(nameof(Animal_PointerUp)));
+            });
         }
     }
 }

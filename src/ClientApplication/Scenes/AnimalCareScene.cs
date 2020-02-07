@@ -13,14 +13,6 @@ namespace Amolenk.ServerlessPonies.ClientApplication.Scenes
     public class AnimalCareScene : Scene,
         IEventHandler<AnimalMoodChangedEvent>
     {
-        private enum ActivityState
-        {
-            None,
-            Cleaning,
-            Feeding,
-            Watering
-        }
-
         public const string Name = "AnimalCare";
 
         private const string SPRITE_ANIMAL = "animal";
@@ -34,6 +26,7 @@ namespace Amolenk.ServerlessPonies.ClientApplication.Scenes
         private readonly ApiClient _apiClient;
 
         private string _activitySprite;
+        private double _cleaningPoints;
 
         public AnimalCareScene(ApiClient apiClient)
         {
@@ -87,7 +80,12 @@ namespace Amolenk.ServerlessPonies.ClientApplication.Scenes
         {
             if (_activitySprite == SPRITE_CLEAN)
             {
-                Console.WriteLine("+ happiness points!");
+                _cleaningPoints += e.Distance;
+                if (_cleaningPoints >= 10000)
+                {
+                    Console.WriteLine("Cleaning points!");
+                    _cleaningPoints = 0;
+                }
             }
         }
 
@@ -112,6 +110,7 @@ namespace Amolenk.ServerlessPonies.ClientApplication.Scenes
                     .Scale(0.15)));
 
             _activitySprite = SPRITE_CLEAN;
+            _cleaningPoints = 0;
         }
 
         [JSInvokable]

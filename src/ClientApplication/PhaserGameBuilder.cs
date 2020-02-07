@@ -10,7 +10,7 @@ namespace ClientApplication
     {
         private readonly IPhaserInterop _phaser;
         private readonly IServiceProvider _serviceProvider;
-        private GameState _state;
+        private string _playerName;
         private List<Type> _sceneTypes; 
 
         public PhaserGameBuilder(IPhaserInterop phaser, IServiceProvider serviceProvider)
@@ -20,9 +20,9 @@ namespace ClientApplication
             _sceneTypes = new List<Type>();
         }
 
-        public PhaserGameBuilder WithState(GameState state)
+        public PhaserGameBuilder WithPlayerName(string playerName)
         {
-            _state = state;
+            _playerName = playerName;
             return this;
         }
 
@@ -34,13 +34,21 @@ namespace ClientApplication
 
         public PhaserGame Build()
         {
-            return new PhaserGame(_phaser, _sceneTypes.Select(RegisterSceneInstance));
+            var stateManager = new StateManager(_playerName);
+
+            return new PhaserGame(_phaser, _sceneTypes.Select(sceneType => RegisterSceneInstance(sceneType, stateManager)));
         }
 
-        private Scene RegisterSceneInstance(Type sceneType)
+        private Scene RegisterSceneInstance(Type sceneType, IStateManager stateManager)
         {
             var scene = (Scene)_serviceProvider.GetService(sceneType);
-            scene.Initialize(_phaser, _state);
+            if (scene == null)
+            {
+                throw new InvalidOperationException($"Scene of type '{sceneType}' could not be instantiated."
+                    + " Make sure it's properly configured with the dependency injection framework.");
+            }
+
+            scene.Initialize(_phaser, stateManager);
 
             _phaser.RegisterScene(scene);
 

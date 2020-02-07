@@ -1,5 +1,6 @@
 using Amolenk.ServerlessPonies.ClientApplication.Phaser;
 using ClientApplication;
+using Newtonsoft.Json;
 using System;
 
 namespace Amolenk.ServerlessPonies.ClientApplication.Scenes
@@ -7,35 +8,38 @@ namespace Amolenk.ServerlessPonies.ClientApplication.Scenes
     public abstract class Scene
     {
         private IPhaserInterop _phaser;
+        private IStateManager _stateManager;
 
         protected Scene()
         {
         }
 
-        // protected SceneManager SceneManager { get; private set; }
+        protected string PlayerName => _stateManager.PlayerName;
 
-        // protected ApiClient ApiClient { get; private set; }
+        protected GameState State => _stateManager.State;
 
-        protected GameState State { get; private set; }
-
-        public void Initialize(IPhaserInterop phaser, GameState state)
+        public void Initialize(IPhaserInterop phaser, IStateManager stateManager)
         {
             _phaser = phaser;
-
-            this.State = state;
+            _stateManager = stateManager;
         }
 
         protected void Phaser(Action<IPhaserSceneInterop> interop)
         {
-            interop(_phaser.Scene(this));
+            var scene = _phaser.Scene(this);
+            if (scene.IsVisible())
+            {
+                interop(scene);
+            }
         }
 
         public abstract string GetName();
 
-        public virtual void InitializeState(GameState state)
-        {
-        }
-
         public abstract void Create();
+
+        protected void SetState(GameState state)
+        {
+            _stateManager.State = state;
+        }
     }
 }

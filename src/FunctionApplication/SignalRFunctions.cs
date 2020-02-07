@@ -13,10 +13,10 @@ namespace Amolenk.ServerlessPonies.FunctionApplication
     {
         // When the client app opens, it requires valid connection credentials to connect to the
         // Azure SignalR service. This function will return the connection information.
-        [FunctionName("negotiate")]
+        [FunctionName("GetSignalRInfo")]
         public static SignalRConnectionInfo GetSignalRInfo(
-            [HttpTrigger(AuthorizationLevel.Anonymous, "post")] HttpRequest req,
-            [SignalRConnectionInfo(HubName = "ponies")] SignalRConnectionInfo connectionInfo)
+            [HttpTrigger(AuthorizationLevel.Anonymous, "POST", Route = "signalr/{userId}/negotiate")] HttpRequest req,
+            [SignalRConnectionInfo(HubName = "ponies", UserId = "{userId}")] SignalRConnectionInfo connectionInfo)
             => connectionInfo;
 
         [FunctionName("events")]

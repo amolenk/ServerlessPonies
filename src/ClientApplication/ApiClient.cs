@@ -19,17 +19,51 @@ namespace ClientApplication
             _client = client;
         }
 
-        public Task PlaceAnimal(string animalId, string enclosureId)
+        public Task JoinGame(string gameName, string playerName)
         {
-            var command = new PlaceAnimalCommand
+            var command = new JoinGameCommand
             {
-                PlayerId = "",
-                AnimalId = animalId,
-                EnclosureId = enclosureId
+                PlayerName = playerName
             };
 
-            // TODO Use better REST resources.
-            return _client.SendJsonAsync(HttpMethod.Post, $"http://localhost:7071/api/PlaceAnimal", command);
+            return _client.SendJsonAsync(HttpMethod.Post, $"http://localhost:7071/api/game/{gameName}/join", command);
+        }
+
+        public Task StartSinglePlayerGame(string gameName, string playerName)
+        {
+            var command = new StartSinglePlayerGameCommand
+            {
+                PlayerName = playerName
+            };
+
+            return _client.SendJsonAsync(HttpMethod.Post, $"http://localhost:7071/api/game/{gameName}/start", command);
+        }
+
+        public Task StartGame(string gameName)
+        {
+            return _client.PatchAsync($"http://localhost:7071/api/game/{gameName}/start", null);
+        }
+
+        public Task PurchaseAnimalAsync(string gameName, string animalName, string ownerName)
+        {
+            var command = new PurchaseAnimalCommand
+            {
+                AnimalName = animalName,
+                OwnerName = ownerName
+            };
+
+            return _client.SendJsonAsync(HttpMethod.Post, $"http://localhost:7071/api/game/{gameName}/purchase-animal", command);
+        }
+
+        public Task MoveAnimal(string gameName, string animalName, string enclosureName)
+        {
+            var command = new MoveAnimalCommand
+            {
+                AnimalName = animalName,
+                EnclosureName = enclosureName
+            };
+
+            return _client.SendJsonAsync(HttpMethod.Post, $"http://localhost:7071/api/game/{gameName}/move-animal", command);
         }
     }
 }

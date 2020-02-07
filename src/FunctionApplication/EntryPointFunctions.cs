@@ -4,6 +4,7 @@ using System.Net.Http;
 using System.Threading.Tasks;
 using Amolenk.ServerlessPonies.FunctionApplication.Dto;
 using Amolenk.ServerlessPonies.FunctionApplication.Entities;
+using Amolenk.ServerlessPonies.FunctionApplication.Model;
 using Amolenk.ServerlessPonies.Messages;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Azure.WebJobs;
@@ -24,95 +25,92 @@ namespace Amolenk.ServerlessPonies.FunctionApplication
             _eventPublisher = eventPublisher;
         }
 
-        [FunctionName("StartGame")]
-        public static Task StartGame(
-            [HttpTrigger(AuthorizationLevel.Anonymous, "post")] PlayerInfo playerInfo,
-            [DurableClient] IDurableEntityClient client)
-            => client.SignalEntityAsync<IPlayer>(playerInfo.Id, player => player.StartGame(playerInfo));
-
-        // [FunctionName("BuyAnimal")]
-        // public static async Task BuyAnimal(
-        //     [HttpTrigger(AuthorizationLevel.Anonymous, "POST")] BuyAnimalRequestDto request,
-        //     [DurableClient] IDurableOrchestrationClient client,
-        //     ILogger log)
-        // {
-        //     string instanceId = await client.StartNewAsync("BuyAnimalCore", request);
-
-        //     log.LogInformation($"Started orchestration with ID = '{instanceId}'.");
-        // }
-
-        // [FunctionName("BuyAnimalCore")]
-        // public async Task BuyAnimalCore(
-        //     [OrchestrationTrigger] IDurableOrchestrationContext context)
-        // {
-        //     BuyAnimalRequestDto request = context.GetInput<BuyAnimalRequestDto>();
-
-        //     var animalEntity = new EntityId(nameof(Animal), request.AnimalId);
-        //     var enclosureEntity = new EntityId(nameof(Enclosure), request.EnclosureId);
-
-        //     using (await context.LockAsync(animalEntity, enclosureEntity))
-        //     {
-        //         IEnclosure enclosureProxy = context.CreateEntityProxy<IEnclosure>(enclosureEntity);
-        //         var enclosureOwner = await enclosureProxy.GetOwnerId();
-
-        //         IAnimal animalProxy = context.CreateEntityProxy<IAnimal>(animalEntity);
-
-        //         await animalProxy.SetOwner(request.PlayerId);
-        //     }
-
-        //     await _eventPublisher.PublishAsync(request.PlayerId, MessageEnvelope.Wrap(new AnimalPlacedEvent
-        //     {
-        //         OwnerId = request.PlayerId,
-        //         EnclosureId = "[enclosure]",
-        //         AnimalId = request.AnimalId
-        //     }));
-        // }
-
-        [FunctionName("PlaceAnimal")]
-        public static async Task PlaceAnimal(
-            [HttpTrigger(AuthorizationLevel.Anonymous, "POST")] PlaceAnimalCommand command,
-            [DurableClient] IDurableOrchestrationClient client,
-            ILogger log)
+        [FunctionName("JoinGame")]
+        public static Task JoinGame(
+            [HttpTrigger(AuthorizationLevel.Anonymous, "POST", Route = "game/{gameName}/join")] JoinGameCommand command,
+            [DurableClient] IDurableEntityClient client,
+            string gameName)
         {
-            string instanceId = await client.StartNewAsync("PlaceAnimalCore", command);
-
-            log.LogInformation($"Started orchestration with ID = '{instanceId}'.");
+            var entityId = new EntityId(nameof(Game), gameName);
+            return client.SignalEntityAsync<IGame>(entityId, proxy => proxy.Join(command.PlayerName));
         }
 
-        [FunctionName("PlaceAnimalCore")]
-        public async Task PlaceAnimalCore(
-            [OrchestrationTrigger] IDurableOrchestrationContext context,
-            [SignalR(HubName = "ponies")] IAsyncCollector<SignalRMessage> signalRMessages)
+        [FunctionName("StartGame")]
+        public static Task StartGame(
+            [HttpTrigger(AuthorizationLevel.Anonymous, "PATCH", Route = "game/{gameName}/start")] HttpRequest request,
+            [DurableClient] IDurableEntityClient client,
+            string gameName)
         {
-            PlaceAnimalCommand command = context.GetInput<PlaceAnimalCommand>();
-
-            var enclosureEntityId = new EntityId(nameof(Enclosure), command.EnclosureId);
-            var animalEntityId = new EntityId(nameof(Animal), command.AnimalId);
-
-            using (await context.LockAsync(enclosureEntityId, animalEntityId))
+            var entityId = new EntityId(nameof(Game), gameName);
+            return client.SignalEntityAsync<IGame>(entityId, proxy => proxy.Start());
+        }
+        
+        [FunctionName("StartSinglePlayerGame")]
+        public static async Task StartSinglePlayerGame(
+            [HttpTrigger(AuthorizationLevel.Anonymous, "POST", Route = "game/{gameName}/start")] StartSinglePlayerGameCommand command,
+            [DurableClient] IDurableEntityClient client,
+            [SignalR(HubName = "ponies")] IAsyncCollector<SignalRGroupAction> signalRGroupActions,
+            string gameName)
+        {
+            await signalRGroupActions.AddAsync(new SignalRGroupAction
             {
-                // TODO Verify that player owns enclosure.
-                // TODO Verify that player owns animal.
+                UserId = command.PlayerName,
+                GroupName = gameName,
+                Action = GroupAction.Add
+            });
 
-                IEnclosure enclosureEntityProxy = context.CreateEntityProxy<IEnclosure>(enclosureEntityId);
-                await enclosureEntityProxy.PlaceAnimal(command.AnimalId);
+            var entityId = new EntityId(nameof(Game), gameName);
+            await client.SignalEntityAsync<IGame>(entityId, proxy => proxy.StartSinglePlayer(command.PlayerName));
+        }
 
-                IAnimal animalEntityProxy = context.CreateEntityProxy<IAnimal>(animalEntityId);
-                await animalEntityProxy.SetOwner("owner");
-            }
+        [FunctionName("Ping")]
+        public static void Ping(
+            [HttpTrigger(AuthorizationLevel.Anonymous, "GET")] HttpRequest req,
+            ILogger log)
+        {
+            log.LogInformation($"Received PING request.");
+        }
 
-            await signalRMessages.AddAsync(
-                new SignalRMessage
-                {
-                    Target = "newMessage",// TODO Rename to 'handleEvent'
-                    Arguments = new[] { MessageEnvelope.Wrap(new AnimalPlacedEvent
-                    {
-                        EnclosureId = command.EnclosureId,
-                        AnimalId = command.AnimalId
-                    }) }
-                });
+        [FunctionName("PurchaseAnimal")]
+        public static Task PurchaseAnimal(
+            [HttpTrigger(AuthorizationLevel.Anonymous, "POST", Route = "game/{gameName}/purchase-animal")] PurchaseAnimalCommand command,
+            [DurableClient] IDurableEntityClient client,
+            string gameName)
+        {
+            var transfer = new AnimalPurchase
+            {
+                AnimalName = command.AnimalName,
+                NewOwnerName = command.OwnerName
+            };
 
-//            await _eventPublisher.PublishAsync(command.PlayerId, MessageEnvelope.Wrap());
+            var entityId = new EntityId(nameof(Game), gameName);
+            return client.SignalEntityAsync<IGame>(entityId, proxy => proxy.PurchaseAnimalAsync(transfer));
+        }
+
+        [FunctionName("MoveAnimal")]
+        public static Task MoveAnimal(
+            [HttpTrigger(AuthorizationLevel.Anonymous, "POST", Route = "game/{gameName}/move-animal")] MoveAnimalCommand command,
+            [DurableClient] IDurableEntityClient client,
+            string gameName)
+        {
+            var movement = new AnimalMovement
+            {
+                AnimalName = command.AnimalName,
+                NewEnclosureName = command.EnclosureName
+            };
+
+            var entityId = new EntityId(nameof(Game), gameName);
+            return client.SignalEntityAsync<IGame>(entityId, proxy => proxy.MoveAnimalAsync(movement));
+        }
+
+        [FunctionName("AnimalState")]
+        public static async Task<HttpResponseMessage> Run(
+            [HttpTrigger(AuthorizationLevel.Function)] HttpRequestMessage req,
+            [DurableClient] IDurableEntityClient client)
+        {
+            var entityId = new EntityId(nameof(Animal), "foo");
+            EntityStateResponse<JObject> stateResponse = await client.ReadEntityStateAsync<JObject>(entityId);
+            return req.CreateResponse(HttpStatusCode.OK, stateResponse.EntityState);
         }
     }
 }

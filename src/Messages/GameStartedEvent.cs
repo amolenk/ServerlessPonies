@@ -7,6 +7,8 @@ namespace Amolenk.ServerlessPonies.Messages
     {
         public string GameName { get; set; }
 
+        public List<PlayerState> Players { get; set; }
+
         public List<AnimalState> Animals { get; set; }
     }
 }

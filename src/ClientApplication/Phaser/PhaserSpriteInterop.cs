@@ -21,6 +21,11 @@ namespace Amolenk.ServerlessPonies.ClientApplication.Phaser
             _spriteName = spriteName;
         }
 
+        public bool Exists()
+        {
+            return _jsRuntime.Invoke<bool>("spriteExists", _sceneName, _spriteName);
+        }
+
         public IPhaserSpriteInterop Crop(double x, double y, double width, double height)
         {
             _jsRuntime.InvokeVoid("setSpriteCrop", _sceneName, _spriteName, x, y, width, height);

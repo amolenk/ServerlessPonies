@@ -5,7 +5,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace ClientApplication
+namespace Amolenk.ServerlessPonies.ClientApplication.Model
 {
     public class GameState
     {
@@ -17,19 +17,24 @@ namespace ClientApplication
 
         public string SelectedAnimalName { get; set; }
 
+        public List<Player> Players { get; set; }
+
         public List<Animal> Animals { get; set; }
 
         public List<Enclosure> Enclosures { get; set; }
         
         public event EventHandler<Animal> AnimalStateChanged;
 
+        public event EventHandler<Animal> AnimalPurchaseFailed;
+
         public Animal SelectedAnimal()
             => Animals.Find(animal => animal.Name == SelectedAnimalName);
 
+        public Player FindPlayer(string name)
+            => Players.Find(player => player.Name == name);
+
         public Animal FindAnimal(string name)
-        {
-            return Animals.Find(animal => animal.Name == name);
-        }
+            => Animals.Find(animal => animal.Name == name);
 
         // public void UpdateAnimalState(string name, Action<Animal> update)
         // {

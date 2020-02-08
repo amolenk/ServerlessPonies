@@ -11,11 +11,13 @@ using System.Threading.Tasks;
 namespace Amolenk.ServerlessPonies.ClientApplication.Handlers
 {
     public class AnimalEventHandler : IEventHandler2<AnimalMovedEvent>,
-        IEventHandler2<AnimalPurchasedEvent>
+        IEventHandler2<AnimalPurchasedEvent>,
+        IEventHandler2<AnimalPurchaseFailedEvent>,
+        IEventHandler2<AnimalMoodChangedEvent>
     {
         public void Handle(AnimalMovedEvent @event, IStateManager stateManager)
         {
-            var animal = stateManager.State.Animals.Find(animal => animal.Name == @event.AnimalName);
+            var animal = stateManager.State.FindAnimal(@event.AnimalName);
             if (animal != null)
             {
                 animal.EnclosureName = @event.EnclosureName;
@@ -24,22 +26,33 @@ namespace Amolenk.ServerlessPonies.ClientApplication.Handlers
 
         public void Handle(AnimalPurchasedEvent @event, IStateManager stateManager)
         {
-            var animal = stateManager.State.Animals.Find(animal => animal.Name == @event.AnimalName);
+            var animal = stateManager.State.FindAnimal(@event.AnimalName);
             if (animal != null)
             {
                 animal.OwnerName = @event.OwnerName;
             }
         }
 
-        // public void Handle(AnimalMoodChangedEvent @event)
-        // {
-        //     var animal = State.Animals.Find(animal => animal.Name == @event.AnimalName);
-        //     if (animal != null)
-        //     {
-        //         animal.HappinessLevel = @event.HappinessLevel;
-        //         animal.HungrinessLevel = @event.HungrinessLevel;
-        //         animal.ThirstinessLevel = @event.ThirstinessLevel;
-        //     }
-        // }
+        public void Handle(AnimalPurchaseFailedEvent @event, IStateManager stateManager)
+        {
+            var animal = stateManager.State.FindAnimal(@event.AnimalName);
+            if (animal != null)
+            {
+                animal.NotifyPurchaseFailed();
+            }
+        }
+
+        public void Handle(AnimalMoodChangedEvent @event, IStateManager stateManager)
+        {
+            var animal = stateManager.State.FindAnimal(@event.AnimalName);
+            if (animal != null)
+            {
+                Console.WriteLine("Recd happy: " + @event.HappinessLevel);
+
+                animal.HappinessLevel = @event.HappinessLevel;
+                animal.HungrinessLevel = @event.HungrinessLevel;
+                animal.ThirstinessLevel = @event.ThirstinessLevel;
+            }
+        }
     }
 }

@@ -8,12 +8,8 @@ using System.Threading.Tasks;
 
 namespace Amolenk.ServerlessPonies.ClientApplication.Phaser
 {
-    public class SpritePointerEventArgs : ScenePointerEventArgs
+    public interface IPhaserTextInterop
     {
-        public string SpriteName { get; set; }
-
-        public double SpriteX { get; set; }
-
-        public double SpriteY { get; set; }
+        IPhaserTextInterop Value(string text);
     }
 }

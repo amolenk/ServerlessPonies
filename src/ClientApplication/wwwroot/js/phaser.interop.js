@@ -1,10 +1,17 @@
 const sceneInfos = [];
 let currentScene;
 
+// TODO Extract more generic method
 function findSprite(sceneName, spriteName) {
     const sceneInfo = sceneInfos[sceneName];
     return sceneInfo.phaserScene.children.list.find(child => {
         return child.type === "Sprite" && child.name === spriteName
+    });
+}
+function findText(sceneName, textName) {
+    const sceneInfo = sceneInfos[sceneName];
+    return sceneInfo.phaserScene.children.list.find(child => {
+        return child.type === "Text" && child.name === textName
     });
 }
 
@@ -13,7 +20,7 @@ function addSpriteEventHandler(sceneName, spriteName, eventName, handlerName) {
     sprite.setInteractive({ pixelPerfect: true });
     sprite.on(eventName, (pointer) => {
         const sceneInfo = sceneInfos[sceneName];
-        const eventArgs = { 'spriteName': spriteName, 'x': pointer.x, 'y': pointer.y, 'distance': -1 };
+        const eventArgs = { 'spriteName': spriteName, 'spriteX': sprite.x, 'spriteY': sprite.y, 'x': pointer.x, 'y': pointer.y, 'distance': -1 };
         if (pointer.distance) eventArgs.distance = pointer.distance;
         sceneInfo.dotNetScene.invokeMethodAsync(handlerName, eventArgs);
     });
@@ -44,6 +51,15 @@ function setSpriteLocation(sceneName, spriteName, x, y) {
     sprite.y = y;
 }
 
+function spriteExists(sceneName, spriteName) {
+    return findSprite(sceneName, spriteName) != null;
+}
+
+function setTextValue(sceneName, textName, value) {
+    const text = findText(sceneName, textName);
+    text.setText(value);
+}
+
 function getSpriteData(sceneName, spriteName, key) {
     const sprite = findSprite(sceneName, spriteName);
     return sprite.getData(key);
@@ -62,6 +78,12 @@ function addSprite(sceneName, spriteName, imageName, x, y, scale = null, interac
     if (scale) {
         sprite.setScale(scale);
     }
+}
+
+function addText(sceneName, textName, x, y, text, fontSize, fill) {
+    const sceneInfo = sceneInfos[sceneName];
+    const textBox = sceneInfo.phaserScene.add.text(x, y, text, { fontSize: fontSize, fill: fill });
+    textBox.name = textName;
 }
 
 function removeSprite(sceneName, spriteName) {
@@ -118,6 +140,8 @@ function registerScene(name, dotNetScene) {
         this.load.image('logo', './assets/logo.png');
         this.load.image('world', './assets/world.png');
         this.load.image('wally', './assets/wally.png');
+        this.load.image('amigo', './assets/amigo.png');
+        this.load.image('loading', './assets/loading.gif');
         this.load.image('moodlevel', './assets/moodlevel.png');
     };
 

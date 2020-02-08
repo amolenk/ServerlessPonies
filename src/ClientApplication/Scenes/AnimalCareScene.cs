@@ -1,12 +1,9 @@
+using Amolenk.ServerlessPonies.ClientApplication.Model;
 using Amolenk.ServerlessPonies.ClientApplication.Phaser;
 using Amolenk.ServerlessPonies.Messages;
 using ClientApplication;
 using Microsoft.JSInterop;
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Amolenk.ServerlessPonies.ClientApplication.Scenes
 {
@@ -14,14 +11,6 @@ namespace Amolenk.ServerlessPonies.ClientApplication.Scenes
         IEventHandler<AnimalMoodChangedEvent>
     {
         public const string Name = "AnimalCare";
-
-        private const string SPRITE_ANIMAL = "animal";
-        private const string SPRITE_CLEAN = "clean";
-        private const string SPRITE_CLEAN_BUTTON = "btnClean";
-        private const string SPRITE_FEED = "feed";
-        private const string SPRITE_FEED_BUTTON = "btnFeed";
-        private const string SPRITE_WATER = "water";
-        private const string SPRITE_WATER_BUTTON = "btnWater";
 
         private readonly ApiClient _apiClient;
 
@@ -39,30 +28,30 @@ namespace Amolenk.ServerlessPonies.ClientApplication.Scenes
         public override void Create()
         {
             Phaser(interop => interop
-                .AddSprite(SPRITE_ANIMAL, "wally", 400, 300, options => options
+                .AddSprite("sprAnimal", "wally", 400, 300, options => options
                     .OnPointerMove(nameof(Animal_PointerMove))
                     .OnPointerUp(nameof(Animal_PointerUp)))
                 
-                .AddSprite("backToRanch", "logo", 700, 100, options => options
-                    .Scale(0.3)
-                    .OnPointerUp(nameof(BackToRanch_PointerUp)))
-                
-                .AddSprite("happinessLevel", "moodlevel", 150, 50)
-                .AddSprite("hungrinessLevel", "moodlevel", 150, 70)
-                .AddSprite("thirstinessLevel", "moodlevel", 150, 90)
+                .AddSprite("sprHappiness", "moodlevel", 150, 50)
+                .AddSprite("sprHungriness", "moodlevel", 150, 70)
+                .AddSprite("sprThirstiness", "moodlevel", 150, 90)
 
-                .AddSprite(SPRITE_CLEAN_BUTTON, "brush", 50, 50, options => options
+                .AddSprite("btnClean", "brush", 50, 150, options => options
                     .Scale(0.1)
                     .OnPointerDown(nameof(CleanButton_PointerDown)))
                 
-                .AddSprite(SPRITE_FEED_BUTTON, "logo", 50, 100, options => options
+                .AddSprite("btnFeed", "logo", 50, 200, options => options
                     .Scale(0.1)
                     .OnPointerDown(nameof(FeedButton_PointerDown)))
                 
-                .AddSprite(SPRITE_WATER_BUTTON, "logo", 50, 150, options => options
+                .AddSprite("btnWater", "logo", 50, 250, options => options
                     .Scale(0.1)
                     .OnPointerDown(nameof(WaterButton_PointerDown)))
-                
+
+                .AddSprite("btnBack", "logo", 700, 100, options => options
+                    .Scale(0.3)
+                    .OnPointerUp(nameof(btnBack_PointerUp)))
+
                 .OnPointerMove(nameof(Scene_PointerMove))
                 .OnPointerUp(nameof(Scene_PointerUp)));
 
@@ -70,7 +59,7 @@ namespace Amolenk.ServerlessPonies.ClientApplication.Scenes
         }
 
         [JSInvokable]
-        public void BackToRanch_PointerUp(SpritePointerEventArgs e)
+        public void btnBack_PointerUp(SpritePointerEventArgs e)
         {
             Phaser(interop => interop.SwitchToScene(RanchScene.Name));
         }
@@ -78,7 +67,7 @@ namespace Amolenk.ServerlessPonies.ClientApplication.Scenes
         [JSInvokable]
         public void Animal_PointerMove(SpritePointerEventArgs e)
         {
-            if (_activitySprite == SPRITE_CLEAN)
+            if (_activitySprite == "sprClean")
             {
                 _cleaningPoints += e.Distance;
                 if (_cleaningPoints >= 10000)
@@ -92,11 +81,16 @@ namespace Amolenk.ServerlessPonies.ClientApplication.Scenes
         [JSInvokable]
         public void Animal_PointerUp(SpritePointerEventArgs e)
         {
-            if (_activitySprite == SPRITE_FEED)
+            if (_activitySprite == "sprFeed")
             {
+                _apiClient.FeedAnimal(
+                    StateManager.State.GameName,
+                    StateManager.PlayerName,
+                    StateManager.State.SelectedAnimalName);
+
                 Console.WriteLine("Feeding points!");
             }
-            else if (_activitySprite == SPRITE_WATER)
+            else if (_activitySprite == "sprWater")
             {
                 Console.WriteLine("Watering points!");
             }
@@ -106,10 +100,10 @@ namespace Amolenk.ServerlessPonies.ClientApplication.Scenes
         public void CleanButton_PointerDown(SpritePointerEventArgs e)
         {
             Phaser(interop => interop
-                .AddSprite(SPRITE_CLEAN, "brush", e.X, e.Y, options => options
+                .AddSprite("sprClean", "brush", e.X, e.Y, options => options
                     .Scale(0.15)));
 
-            _activitySprite = SPRITE_CLEAN;
+            _activitySprite = "sprClean";
             _cleaningPoints = 0;
         }
 
@@ -117,10 +111,10 @@ namespace Amolenk.ServerlessPonies.ClientApplication.Scenes
         public void FeedButton_PointerDown(SpritePointerEventArgs e)
         {
             Phaser(interop => interop
-                .AddSprite(SPRITE_FEED, "logo", e.X, e.Y, options => options
+                .AddSprite("sprFeed", "logo", e.X, e.Y, options => options
                     .Scale(0.15)));
 
-            _activitySprite = SPRITE_FEED;
+            _activitySprite = "sprFeed";
         }
 
         [JSInvokable]
@@ -143,10 +137,10 @@ namespace Amolenk.ServerlessPonies.ClientApplication.Scenes
         public void WaterButton_PointerDown(SpritePointerEventArgs e)
         {
             Phaser(interop => interop
-                .AddSprite(SPRITE_WATER, "logo", e.X, e.Y, options => options
+                .AddSprite("sprWater", "logo", e.X, e.Y, options => options
                     .Scale(0.15)));
 
-            _activitySprite = SPRITE_WATER;
+            _activitySprite = "sprWater";
         }
 
         public void Handle(AnimalMoodChangedEvent @event)
@@ -162,6 +156,21 @@ namespace Amolenk.ServerlessPonies.ClientApplication.Scenes
             }
         }
 
+        // TODO Rename to WireStateHandlers?
+        protected override void StateChanged(GameState state)
+        {
+            foreach (var animal in state.Animals)
+            {
+                animal.MoodChanged += (sender, args) =>
+                {
+                    if (sender == StateManager.State.SelectedAnimal())
+                    {
+                        UpdateMoodLevelSprites((Animal)sender);
+                    }
+                };
+            }
+        }
+
         private void UpdateMoodLevelSprites(Animal animal)
         {
             // TODO Use colors for mood levels
@@ -170,9 +179,12 @@ namespace Amolenk.ServerlessPonies.ClientApplication.Scenes
             {
                 var animal = State.SelectedAnimal();
 
-                interop.Sprite("happinessLevel").Crop(0, 0, (int)(animal.HappinessLevel * 100), 10);
-                interop.Sprite("hungrinessLevel").Crop(0, 0, (int)(animal.HungrinessLevel * 100), 10);
-                interop.Sprite("thirstinessLevel").Crop(0, 0, (int)(animal.ThirstinessLevel * 100), 10);
+                Console.WriteLine(animal.Name);
+                Console.WriteLine(animal.ThirstinessLevel);
+
+                interop.Sprite("sprHappiness").Crop(0, 0, (int)(animal.HappinessLevel * 100), 10);
+                interop.Sprite("sprHungriness").Crop(0, 0, (int)(animal.HungrinessLevel * 100), 10);
+                interop.Sprite("sprThirstiness").Crop(0, 0, (int)(animal.ThirstinessLevel * 100), 10);
             });
         }
     }

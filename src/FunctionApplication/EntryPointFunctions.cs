@@ -102,6 +102,16 @@ namespace Amolenk.ServerlessPonies.FunctionApplication
             return client.SignalEntityAsync<IGame>(entityId, proxy => proxy.MoveAnimalAsync(movement));
         }
 
+        [FunctionName("FeedAnimal")]
+        public static Task FeedAnimal(
+            [HttpTrigger(AuthorizationLevel.Anonymous, "POST", Route = "game/{gameName}/feed-animal")] FeedAnimalCommand command,
+            [DurableClient] IDurableEntityClient client,
+            string gameName)
+        {
+            var entityId = new EntityId(nameof(AnimalBehavior), $"{gameName}:{command.AnimalName}:{command.PlayerName}");
+            return client.SignalEntityAsync<IAnimalBehavior>(entityId, proxy => proxy.Feed());
+        }
+
         // [FunctionName("AnimalState")]
         // public static async Task<HttpResponseMessage> Run(
         //     [HttpTrigger(AuthorizationLevel.Function)] HttpRequestMessage req,

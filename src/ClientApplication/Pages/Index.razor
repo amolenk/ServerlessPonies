@@ -45,17 +45,24 @@
         }
 
         var animalEventHandler = new AnimalEventHandler();
+        var playerEventHandler = new PlayerEventHandler();
 
         game = new PhaserGameBuilder(Phaser, ServiceProvider)
             .WithPlayerName(playerName)
             .WithScene<BootScene>()
             .WithScene<RanchScene>()
             .WithScene<AnimalCareScene>()
+            .WithScene<AnimalPurchaseScene>()
+            .WithScene<AnimalSelectionScene>()
             .WithScene<AnimalManagementScene>()
+            .WithScene<CreditsScene>()
             .WithScene<SpinnerScene>()
             .WithEventHandler<GameStartedEvent>(new GameStartedEventHandler())
+            .WithEventHandler<AnimalMoodChangedEvent>(animalEventHandler)
             .WithEventHandler<AnimalMovedEvent>(animalEventHandler)
             .WithEventHandler<AnimalPurchasedEvent>(animalEventHandler)
+            .WithEventHandler<AnimalPurchaseFailedEvent>(animalEventHandler)
+            .WithEventHandler<CreditsChangedEvent>(playerEventHandler)
             .Build();
 
         game.Start("phaser-container", Title);
@@ -63,6 +70,7 @@
         await new ApiClient(HttpClient).StartSinglePlayerGame(Guid.NewGuid().ToString("N"), playerName);
     }
 
+    // TODO HandleMessage
     void HandleEvent(string eventName, string eventPayload)
     {
         // TODO Use logger

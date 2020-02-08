@@ -17,8 +17,11 @@ namespace ClientApplication
             services.AddTransient<ApiClient>(); // TODO Refit?
             services
                 .AddTransient<BootScene>()
+                .AddTransient<CreditsScene>()
                 .AddTransient<RanchScene>()
                 .AddTransient<AnimalManagementScene>()
+                .AddTransient<AnimalPurchaseScene>()
+                .AddTransient<AnimalSelectionScene>()
                 .AddTransient<AnimalCareScene>()
                 .AddTransient<SpinnerScene>();
         }

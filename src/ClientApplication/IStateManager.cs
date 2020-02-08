@@ -1,5 +1,6 @@
 
 using System;
+using Amolenk.ServerlessPonies.ClientApplication.Model;
 
 namespace ClientApplication
 {

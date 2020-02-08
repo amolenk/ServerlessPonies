@@ -27,7 +27,10 @@ namespace Amolenk.ServerlessPonies.ClientApplication.Scenes
                     .AddSprite("world", "world", 400, 300, options => options.Scale(0.2))
                     .AddSprite("button", "brush", 100, 125, options => options
                         .Scale(0.2)                    
-                        .OnPointerUp(nameof(Button_PointerUp)));
+                        .OnPointerUp(nameof(Button_PointerUp)))
+                    .AddSprite(SpriteName.Create("btnEnclosure", "1"), "logo", 400, 300, options => options
+                        .Scale(0.3)
+                        .OnPointerUp(nameof(btnEnclosure_PointerUp)));
 
                 foreach (var animal in State.Animals)
                 {
@@ -45,9 +48,17 @@ namespace Amolenk.ServerlessPonies.ClientApplication.Scenes
         {
             State.SelectedEnclosureName = "1";
 
-            Phaser(interop => interop.SwitchToScene(AnimalManagementScene.Name));
+            Phaser(interop => interop.SwitchToScene(AnimalPurchaseScene.Name));
 
             return Task.CompletedTask;
+        }
+
+        [JSInvokable] // TODO Sync/async
+        public void btnEnclosure_PointerUp(SpritePointerEventArgs e)
+        {
+            State.SelectedEnclosureName = SpriteName.ExtractId(e.SpriteName);
+
+            Phaser(interop => interop.SwitchToScene(AnimalSelectionScene.Name));
         }
 
         [JSInvokable]

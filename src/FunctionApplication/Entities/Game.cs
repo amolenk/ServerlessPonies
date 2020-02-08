@@ -61,6 +61,13 @@ namespace Amolenk.ServerlessPonies.FunctionApplication.Entities
             return PublishEventAsync(new GameStartedEvent
             {
                 GameName = Entity.Current.EntityKey,
+                Players = PlayerStates
+                    .Select(player => new Messages.PlayerState
+                    {
+                        Name = player.Name,
+                        Credits = player.Credits
+                    })
+                    .ToList(),
                 Animals = AnimalStates
                     .Select(animal => new Messages.AnimalState
                     {
@@ -75,21 +82,40 @@ namespace Amolenk.ServerlessPonies.FunctionApplication.Entities
 
         public async Task PurchaseAnimalAsync(AnimalPurchase purchase)
         {
-            // TODO Check for enough credits.
+            var owner = PlayerStates[purchase.NewOwnerName];
+            var animal = AnimalStates[purchase.AnimalName];
 
-            AnimalStates[purchase.AnimalName].OwnerName = purchase.NewOwnerName;
-
-            await PublishEventAsync(new AnimalPurchasedEvent
+            if (animal?.OwnerName == null && animal?.Price <= owner?.Credits)
             {
-                AnimalName = purchase.AnimalName,
-                OwnerName = purchase.NewOwnerName
-            });
+                owner.Credits -= animal.Price;
+                animal.OwnerName = owner.Name;
+            
+                await PublishEventAsync(new AnimalPurchasedEvent
+                {
+                    AnimalName = purchase.AnimalName,
+                    OwnerName = purchase.NewOwnerName
+                });
 
-            // Key of the animal behavior entity is:
-            // <GameName>:<AnimalName>:<OwnerName>
-            var entityKey = $"{Entity.Current.EntityKey}:{purchase.AnimalName}:{purchase.NewOwnerName}";
-            var entityId = new EntityId(nameof(AnimalBehavior), entityKey);
-            Entity.Current.SignalEntity<IAnimalBehavior>(entityId, proxy => proxy.Start());
+                await PublishEventAsync(new CreditsChangedEvent
+                {
+                    PlayerName = owner.Name,
+                    Credits = owner.Credits
+                });
+
+                // Key of the animal behavior entity is:
+                // <GameName>:<AnimalName>:<OwnerName>
+                var entityKey = $"{Entity.Current.EntityKey}:{purchase.AnimalName}:{purchase.NewOwnerName}";
+                var entityId = new EntityId(nameof(AnimalBehavior), entityKey);
+                Entity.Current.SignalEntity<IAnimalBehavior>(entityId, proxy => proxy.Start());
+            }
+            else
+            {
+                await PublishEventAsync(new AnimalPurchaseFailedEvent
+                {
+                    AnimalName = purchase.AnimalName,
+                    OwnerName = purchase.NewOwnerName
+                });
+            }
         }
 
         public async Task MoveAnimalAsync(AnimalMovement movement)
@@ -125,7 +151,7 @@ namespace Amolenk.ServerlessPonies.FunctionApplication.Entities
 
         private void AddPlayer(string playerName)
         {
-            var playerState = PlayerState.Default(playerName);
+            var playerState = Model.PlayerState.Default(playerName);
 
             PlayerStates.Add(playerState);
         }

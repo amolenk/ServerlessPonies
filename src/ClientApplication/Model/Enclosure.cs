@@ -5,7 +5,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace ClientApplication
+namespace Amolenk.ServerlessPonies.ClientApplication.Model
 {
     public class Enclosure
     {

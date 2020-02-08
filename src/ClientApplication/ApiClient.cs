@@ -65,5 +65,16 @@ namespace ClientApplication
 
             return _client.SendJsonAsync(HttpMethod.Post, $"http://localhost:7071/api/game/{gameName}/move-animal", command);
         }
+
+        public Task FeedAnimal(string gameName, string playerName, string animalName)
+        {
+            var command = new FeedAnimalCommand
+            {
+                PlayerName = playerName,
+                AnimalName = animalName
+            };
+
+            return _client.SendJsonAsync(HttpMethod.Post, $"http://localhost:7071/api/game/{gameName}/feed-animal", command);
+        }
     }
 }

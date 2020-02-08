@@ -1,3 +1,4 @@
+using Amolenk.ServerlessPonies.ClientApplication.Model;
 using Amolenk.ServerlessPonies.ClientApplication.Phaser;
 using ClientApplication;
 using Newtonsoft.Json;

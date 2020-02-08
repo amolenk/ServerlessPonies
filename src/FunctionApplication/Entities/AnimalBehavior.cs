@@ -25,6 +25,9 @@ namespace Amolenk.ServerlessPonies.FunctionApplication.Entities
         public string GameName { get; set; } 
 
         [JsonProperty]
+        public bool IsStarted { get; set; } 
+
+        [JsonProperty]
         public string AnimalName { get; set; }
 
         [JsonProperty]
@@ -44,6 +47,7 @@ namespace Amolenk.ServerlessPonies.FunctionApplication.Entities
 
         public void Start()
         {
+            IsStarted = true;
             HappinessLevel = new MoodLevel { Value = 1 };
             HungrinessLevel = new MoodLevel { Value = 1 };
             ThirstinessLevel = new MoodLevel { Value = 1 };
@@ -53,17 +57,26 @@ namespace Amolenk.ServerlessPonies.FunctionApplication.Entities
         
         public void Clean()
         {
-            IncreaseMoodLevel(HappinessLevel, 0.25);
+            if (IsStarted)
+            {
+                IncreaseMoodLevel(HappinessLevel, 0.25);
+            }
         }
 
         public void Feed()
         {
-            IncreaseMoodLevel(HungrinessLevel, 0.25);
+            if (IsStarted)
+            {
+                IncreaseMoodLevel(HungrinessLevel, 0.25);
+            }
         }
 
         public void Water()
         {
-            IncreaseMoodLevel(ThirstinessLevel, 0.25);
+            if (IsStarted)
+            {
+                IncreaseMoodLevel(ThirstinessLevel, 0.25);
+            }
         }
 
         public void ChangeMoodRandomly()

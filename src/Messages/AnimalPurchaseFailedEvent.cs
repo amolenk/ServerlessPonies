@@ -2,10 +2,10 @@
 
 namespace Amolenk.ServerlessPonies.Messages
 {
-    public class FeedAnimalCommand
+    public class AnimalPurchaseFailedEvent
     {
-        public string PlayerName { get; set; }
-
         public string AnimalName { get; set; }
+
+        public string OwnerName { get; set; }
     }
 }

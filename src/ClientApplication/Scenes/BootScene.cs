@@ -21,7 +21,9 @@ namespace Amolenk.ServerlessPonies.ClientApplication.Scenes
                 // TODO Double check GameName as well?
                 if (StateManager.State.IsStarted)
                 {
-                    Phaser(interop => interop.SwitchToScene(RanchScene.Name));
+                    Phaser(interop => interop
+                        .StartScene(CreditsScene.Name)
+                        .SwitchToScene(RanchScene.Name));
                 }
             };
         }

@@ -1,3 +1,4 @@
+using Amolenk.ServerlessPonies.ClientApplication.Model;
 using Amolenk.ServerlessPonies.ClientApplication.Scenes;
 using Amolenk.ServerlessPonies.Messages;
 using ClientApplication;
@@ -18,6 +19,13 @@ namespace Amolenk.ServerlessPonies.ClientApplication.Handlers
             {
                 IsStarted = true,
                 GameName = @event.GameName,
+                Players = @event.Players
+                    .Select(playerState => new Player
+                    {
+                        Name = playerState.Name,
+                        Credits = playerState.Credits
+                    })
+                    .ToList(),
                 Animals = @event.Animals
                     .Select(animalState => new Animal
                     {

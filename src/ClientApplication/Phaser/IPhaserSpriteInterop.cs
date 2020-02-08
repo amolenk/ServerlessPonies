@@ -10,6 +10,8 @@ namespace Amolenk.ServerlessPonies.ClientApplication.Phaser
 {
     public interface IPhaserSpriteInterop
     {
+        bool Exists();
+
         IPhaserSpriteInterop Crop(double x, double y, double width, double height);
 
         IPhaserSpriteInterop Move(double x, double y);

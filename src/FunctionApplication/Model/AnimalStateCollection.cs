@@ -15,6 +15,7 @@ namespace Amolenk.ServerlessPonies.FunctionApplication.Model
         {
             var result = new AnimalStateCollection();
             result.Add(new AnimalState { Name = "wally", Price = 500 });
+            result.Add(new AnimalState { Name = "amigo", Price = 1500 });
 
             return result;
         }

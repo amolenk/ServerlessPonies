@@ -81,19 +81,15 @@ function addRectangle(sceneName, x, y, width, height, color) {
     graphics.fillRectShape(rect);
 }
 
+// TODO Rename to active
 function isSceneVisible(scene) {
-    console.log('scene active: ' + scene + ' = ' + game.scene.isActive(scene));
-    console.log('scene visible: ' + scene + ' = ' + game.scene.isVisible(scene));
     return game.scene.isActive(scene)
         || sceneInfos[scene].isCreating;
 }
 
 function switchScene(from, to) {
-    console.log('stopping scene: ' + from);
-    game.scene.stop(from);
-    console.log('starting scene: ' + to);
-    game.scene.start(to);
-    console.log('scene active after start: ' + to + ' = ' + game.scene.isActive(to));
+    stopScene(from);
+    startScene(to);
 }
 
 function startScene(scene) {
@@ -104,10 +100,11 @@ function stopScene(scene) {
     game.scene.stop(scene);
 }
 
-function registerScene(name, dotNetScene) {
+function shakeCamera(scene) {
+    sceneInfos[scene].phaserScene.cameras.main.flash(250);
+}
 
-//    console.log(name);
-//    console.log(dotNetScene);
+function registerScene(name, dotNetScene) {
 
     var phaserScene = new Phaser.Scene(name);
     sceneInfos[name] = {
@@ -125,6 +122,8 @@ function registerScene(name, dotNetScene) {
     };
 
     phaserScene.create = function () {
+
+        //this.cameras.add(0, 0, 800, 600);
         sceneInfos[name].isCreating = true;
         dotNetScene.invokeMethod('create');
         sceneInfos[name].isCreating = false;
@@ -140,6 +139,9 @@ function startPhaser(container, title) {
         parent: container,
         width: 800,
         height: 600,
+        scale: {
+            mode: Phaser.Scale.WIDTH_CONTROLS_HEIGHT
+        },
         scene: Object.keys(sceneInfos).map(key => sceneInfos[key].phaserScene),
         title: title
       };

@@ -3,6 +3,7 @@
 @using Newtonsoft.Json
 @using Newtonsoft.Json.Linq
 @using Amolenk.ServerlessPonies.Messages;
+@using Amolenk.ServerlessPonies.ClientApplication.Handlers
 @using Amolenk.ServerlessPonies.ClientApplication.Phaser
 @using Amolenk.ServerlessPonies.ClientApplication.Scenes
 @inject IJSRuntime JSRuntime;
@@ -43,6 +44,8 @@
             Console.WriteLine(e.StackTrace);
         }
 
+        var animalEventHandler = new AnimalEventHandler();
+
         game = new PhaserGameBuilder(Phaser, ServiceProvider)
             .WithPlayerName(playerName)
             .WithScene<BootScene>()
@@ -50,6 +53,9 @@
             .WithScene<AnimalCareScene>()
             .WithScene<AnimalManagementScene>()
             .WithScene<SpinnerScene>()
+            .WithEventHandler<GameStartedEvent>(new GameStartedEventHandler())
+            .WithEventHandler<AnimalMovedEvent>(animalEventHandler)
+            .WithEventHandler<AnimalPurchasedEvent>(animalEventHandler)
             .Build();
 
         game.Start("phaser-container", Title);

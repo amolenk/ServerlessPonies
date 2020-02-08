@@ -92,15 +92,19 @@ namespace Amolenk.ServerlessPonies.FunctionApplication.Entities
             Entity.Current.SignalEntity<IAnimalBehavior>(entityId, proxy => proxy.Start());
         }
 
-        public Task MoveAnimalAsync(AnimalMovement movement)
+        public async Task MoveAnimalAsync(AnimalMovement movement)
         {
-            AnimalStates[movement.AnimalName].EnclosureName = movement.NewEnclosureName;
-
-            return PublishEventAsync(new AnimalMovedEvent
+            var animalState = AnimalStates[movement.AnimalName];
+            if (animalState.EnclosureName != movement.NewEnclosureName)
             {
-                AnimalName = movement.AnimalName,
-                EnclosureName = movement.NewEnclosureName
-            });
+                animalState.EnclosureName = movement.NewEnclosureName;
+
+                await PublishEventAsync(new AnimalMovedEvent
+                {
+                    AnimalName = movement.AnimalName,
+                    EnclosureName = movement.NewEnclosureName
+                });
+            }
         }
 
         public Task UpdateAnimalMoodAsync(AnimalMoodChange mood)

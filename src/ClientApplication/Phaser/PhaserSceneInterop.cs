@@ -22,7 +22,7 @@ namespace Amolenk.ServerlessPonies.ClientApplication.Phaser
         public bool IsVisible()
             => _jsRuntime.Invoke<bool>("isSceneVisible", _scene.GetName());
 
-        public IPhaserSceneInterop AddSprite(string name, string imageName, int x, int y, Action<IPhaserSpriteInterop> options)
+        public IPhaserSceneInterop AddSprite(string name, string imageName, double x, double y, Action<IPhaserSpriteInterop> options)
         {
             _jsRuntime.InvokeVoid("addSprite", _scene.GetName(), name, imageName, x, y, 1);
 
@@ -45,7 +45,7 @@ namespace Amolenk.ServerlessPonies.ClientApplication.Phaser
             return new PhaserSpriteInterop(_jsRuntime, _scene.GetName(), name);
         }
 
-        public IPhaserSceneInterop AddRectangle(int x, int y, int width, int height, string color)
+        public IPhaserSceneInterop AddRectangle(double x, double y, double width, double height, string color)
         {
             _jsRuntime.InvokeVoid("addRectangle", _scene.GetName(), x, y, width, height, color);
             return this;
@@ -82,6 +82,11 @@ namespace Amolenk.ServerlessPonies.ClientApplication.Phaser
         public void SwitchToScene(string name)
         {
             _jsRuntime.InvokeVoid("switchScene", _scene.GetName(), name);
+        }
+
+        public void ShakeCamera()
+        {
+            _jsRuntime.InvokeVoid("shakeCamera", _scene.GetName());
         }
     }
 }

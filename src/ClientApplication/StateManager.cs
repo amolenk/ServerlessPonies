@@ -1,8 +1,12 @@
 
+using System;
+
 namespace ClientApplication
 {
     public class StateManager : IStateManager
     {
+        private GameState _state;
+        
         public StateManager(string playerName)
         {
             PlayerName = playerName;
@@ -10,6 +14,17 @@ namespace ClientApplication
 
         public string PlayerName { get; }
 
-        public GameState State { get; set; }
+        public event EventHandler GameStateChanged;
+
+        public GameState State
+        {
+            get { return _state; }
+            set
+            {
+                _state = value;
+                GameStateChanged?.Invoke(this, EventArgs.Empty);
+            }
+        }
+
     }
 }

@@ -12,13 +12,13 @@ namespace Amolenk.ServerlessPonies.ClientApplication.Phaser
     {
         bool IsVisible();
 
-        IPhaserSceneInterop AddSprite(string name, string imageName, int x, int y, Action<IPhaserSpriteInterop> options = null);
+        IPhaserSceneInterop AddSprite(string name, string imageName, double x, double y, Action<IPhaserSpriteInterop> options = null);
 
         IPhaserSceneInterop RemoveSprite(string name);
 
         IPhaserSpriteInterop Sprite(string name);
 
-        IPhaserSceneInterop AddRectangle(int x, int y, int width, int height, string color = "black");
+        IPhaserSceneInterop AddRectangle(double x, double y, double width, double height, string color = "black");
 
         // TODO Create Sync/Async versions
 
@@ -33,5 +33,7 @@ namespace Amolenk.ServerlessPonies.ClientApplication.Phaser
         void StopScene(string name);
 
         void SwitchToScene(string name);
+
+        void ShakeCamera();
     }
 }

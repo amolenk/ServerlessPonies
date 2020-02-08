@@ -18,5 +18,10 @@ namespace Amolenk.ServerlessPonies.ClientApplication.Scenes
         {
             Phaser(interop => interop.AddSprite("spinner", "logo", 400, 300));
         }
+
+        // [JSInvokable("destroy")]
+        // public override void Destroy()
+        // {
+        // }
     }
 }

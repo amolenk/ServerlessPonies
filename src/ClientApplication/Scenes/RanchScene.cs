@@ -1,3 +1,4 @@
+using Amolenk.ServerlessPonies.ClientApplication.Model;
 using Amolenk.ServerlessPonies.ClientApplication.Phaser;
 using Amolenk.ServerlessPonies.Messages;
 using ClientApplication;
@@ -11,9 +12,7 @@ using System.Threading.Tasks;
 
 namespace Amolenk.ServerlessPonies.ClientApplication.Scenes
 {
-    public class RanchScene : Scene,
-        IEventHandler<AnimalMovedEvent>,
-        IEventHandler<AnimalMoodChangedEvent>
+    public class RanchScene : Scene
     {
         public const string Name = "Ranch";
 
@@ -30,14 +29,18 @@ namespace Amolenk.ServerlessPonies.ClientApplication.Scenes
                         .Scale(0.2)                    
                         .OnPointerUp(nameof(Button_PointerUp)));
 
-                foreach (var animal in State.Animals.Where(animal => animal.EnclosureName != null))
+                foreach (var animal in State.Animals)
                 {
-                    AddAnimalSprite(animal);
+                    if (animal.EnclosureName != null)
+                    {
+                        AddAnimalSprite(animal);
+                    }
+
                 }
             });
         }
 
-        [JSInvokable]
+        [JSInvokable] // TODO Sync/async
         public Task Button_PointerUp(SpritePointerEventArgs e)
         {
             State.SelectedEnclosureName = "1";
@@ -57,36 +60,19 @@ namespace Amolenk.ServerlessPonies.ClientApplication.Scenes
             return Task.CompletedTask;
         }
 
-        public void Handle(AnimalMovedEvent @event)
+        protected override void StateChanged(GameState state)
         {
-            var animal = State.Animals.Find(animal => animal.Name == @event.AnimalName);
-            if (animal != null)
+            foreach (var animal in state.Animals)
             {
-                animal.EnclosureName = @event.EnclosureName;
-
-                AddAnimalSprite(animal);
+                animal.EnclosureChanged += AnimalEnclosureChanged;
             }
         }
 
-        public void Handle(AnimalMoodChangedEvent @event)
+        private void AnimalEnclosureChanged(object sender, EnclosureChangedEventArgs e)
         {
-            var animal = State.Animals.Find(animal => animal.Name == @event.AnimalName);
-            if (animal != null)
-            {
-                animal.HappinessLevel = @event.HappinessLevel;
-                animal.HungrinessLevel = @event.HungrinessLevel;
-                animal.ThirstinessLevel = @event.ThirstinessLevel;
-            }
-        }
+            var animal = (Animal)sender;
 
-        protected override void OnInitialized()
-        {
-            State.AnimalStateChanged += AnimalStateChanged;
-        }
-
-        private void AnimalStateChanged(object sender, Animal animal)
-        {
-            Console.WriteLine("Animal state changed!: " + animal.Name);
+            AddAnimalSprite(animal);
         }
 
         private void AddAnimalSprite(Animal animal)

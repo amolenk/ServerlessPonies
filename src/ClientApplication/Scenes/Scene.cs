@@ -18,6 +18,8 @@ namespace Amolenk.ServerlessPonies.ClientApplication.Scenes
 
         protected GameState State => _stateManager.State;
 
+        protected IStateManager StateManager => _stateManager;
+
         public void Initialize(IPhaserInterop phaser, IStateManager stateManager)
         {
             _phaser = phaser;
@@ -26,7 +28,16 @@ namespace Amolenk.ServerlessPonies.ClientApplication.Scenes
             OnInitialized();
         }
 
+        // Actual scenes may not need this anymore
         protected virtual void OnInitialized()
+        {
+            StateManager.GameStateChanged += (sender, args) =>
+            {
+                StateChanged(StateManager.State);
+            };
+        }
+
+        protected virtual void StateChanged(GameState state)
         {
         }
 
@@ -43,6 +54,8 @@ namespace Amolenk.ServerlessPonies.ClientApplication.Scenes
         public abstract string GetName();
 
         public abstract void Create();
+
+       // public abstract void Destroy();
 
         protected void SetState(GameState state)
         {

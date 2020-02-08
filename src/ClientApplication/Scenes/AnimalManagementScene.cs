@@ -1,22 +1,17 @@
+using Amolenk.ServerlessPonies.ClientApplication.Model;
 using Amolenk.ServerlessPonies.ClientApplication.Phaser;
-using Amolenk.ServerlessPonies.Messages;
 using ClientApplication;
 using Microsoft.JSInterop;
 using System;
-using System.Collections.Generic;
 using System.Threading.Tasks;
 
 namespace Amolenk.ServerlessPonies.ClientApplication.Scenes
 {
-    public class AnimalManagementScene : Scene,
-        IEventHandler<AnimalPurchasedEvent>,
-        IEventHandler<AnimalMovedEvent>
+    public class AnimalManagementScene : Scene
     {
         public const string Name = "AnimalManagement";
 
         private readonly ApiClient _apiClient;
-        
-        private Dictionary<string, int> _animalPrices;
 
         public AnimalManagementScene(ApiClient apiClient)
         {
@@ -54,6 +49,7 @@ namespace Amolenk.ServerlessPonies.ClientApplication.Scenes
                             .OnPointerUp(nameof(BuyButton_PointerUp)));
                     }
                 });
+
             }
         }
 
@@ -61,8 +57,18 @@ namespace Amolenk.ServerlessPonies.ClientApplication.Scenes
         public async Task Animal_PointerUp(SpritePointerEventArgs e)
         {
             var animalName = SpriteName.ExtractId(e.SpriteName);
+            var animal = StateManager.State.FindAnimal(animalName);
 
-            await _apiClient.MoveAnimal(State.GameName, animalName, State.SelectedEnclosureName);
+            if (animal.OwnerName == StateManager.PlayerName)
+            {
+                await _apiClient.MoveAnimal(State.GameName, animalName, State.SelectedEnclosureName);
+
+                Phaser(interop => interop.SwitchToScene(RanchScene.Name));
+            }
+            else
+            {
+                Phaser(interop => interop.ShakeCamera());
+            }
         }
 
         [JSInvokable] // TODO Introduce separate sync/async handlers for pointer
@@ -70,26 +76,31 @@ namespace Amolenk.ServerlessPonies.ClientApplication.Scenes
         {
             var animalName = SpriteName.ExtractId(e.SpriteName);
 
-            Console.WriteLine(animalName);
-
             await _apiClient.PurchaseAnimalAsync(State.GameName, animalName, PlayerName);
         }
 
-        public void Handle(AnimalMovedEvent @event)
+        protected override void StateChanged(GameState state)
         {
-            Phaser(interop => interop.SwitchToScene(RanchScene.Name));
+            foreach (var animal in state.Animals)
+            {
+                animal.OwnerChanged += AnimalOwnerChanged;
+            }
         }
 
-        public void Handle(AnimalPurchasedEvent @event)
+        private void AnimalOwnerChanged(object sender, OwnerChangedEventArgs e)
         {
+            var animal = (Animal)sender;
+
             Phaser(interop =>
             {
-                var animal = State.Animals.Find(animal => animal.Name == @event.AnimalName);
-                animal.OwnerName = @event.OwnerName;
-
-                var buyButton = SpriteName.Create("buyButton", @event.AnimalName);
+                var buyButton = SpriteName.Create("buyButton", animal.Name);
                 interop.RemoveSprite(buyButton);
             });
+        }
+
+        private void AnimalStateChanged(object sender, Animal animal)
+        {
+            Console.WriteLine("[AnimalManagementScene] Animal state changed!: " + animal.Name);
         }
     }
 }

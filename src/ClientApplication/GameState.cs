@@ -11,6 +11,8 @@ namespace ClientApplication
     {
         public string GameName { get; set; }
 
+        public bool IsStarted { get; set; }
+
         public string SelectedEnclosureName { get; set; }
 
         public string SelectedAnimalName { get; set; }
@@ -18,21 +20,26 @@ namespace ClientApplication
         public List<Animal> Animals { get; set; }
 
         public List<Enclosure> Enclosures { get; set; }
+        
+        public event EventHandler<Animal> AnimalStateChanged;
 
         public Animal SelectedAnimal()
             => Animals.Find(animal => animal.Name == SelectedAnimalName);
 
-        public EventHandler<Animal> AnimalStateChanged;
-
-        public void UpdateAnimalState(string name, Action<Animal> update)
+        public Animal FindAnimal(string name)
         {
-            var animal = Animals.Find(animal => animal.Name == name);
-            if (animal != null)
-            {
-                update(animal);
-            }
-
-            AnimalStateChanged?.Invoke(this, animal);
+            return Animals.Find(animal => animal.Name == name);
         }
+
+        // public void UpdateAnimalState(string name, Action<Animal> update)
+        // {
+        //     var animal = Animals.Find(animal => animal.Name == name);
+        //     if (animal != null)
+        //     {
+        //         update(animal);
+        //     }
+
+        //     AnimalStateChanged?.Invoke(this, animal);
+        // }
     }
 }

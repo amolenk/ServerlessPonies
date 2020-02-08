@@ -12,12 +12,14 @@ namespace ClientApplication
         private readonly IServiceProvider _serviceProvider;
         private string _playerName;
         private List<Type> _sceneTypes; 
+        private Dictionary<Type, Action<object, IStateManager>> _handlers;
 
         public PhaserGameBuilder(IPhaserInterop phaser, IServiceProvider serviceProvider)
         {
             _phaser = phaser;
             _serviceProvider = serviceProvider;
             _sceneTypes = new List<Type>();
+            _handlers = new Dictionary<Type, Action<object, IStateManager>>();
         }
 
         public PhaserGameBuilder WithPlayerName(string playerName)
@@ -32,8 +34,9 @@ namespace ClientApplication
             return this;
         }
 
-        public PhaserGameBuilder WithEventHandler<T>(IEventHandler<T> handler)
+        public PhaserGameBuilder WithEventHandler<T>(IEventHandler2<T> handler)
         {
+            _handlers.Add(typeof(T), (@event, stateManager) => handler.Handle((T)@event, stateManager));
             return this;
         }
 
@@ -44,7 +47,8 @@ namespace ClientApplication
             return new PhaserGame(
                 _phaser,
                 stateManager,
-                _sceneTypes.Select(sceneType => RegisterSceneInstance(sceneType, stateManager)));
+                _sceneTypes.Select(sceneType => RegisterSceneInstance(sceneType, stateManager)),
+                _handlers);
         }
 
         private Scene RegisterSceneInstance(Type sceneType, IStateManager stateManager)

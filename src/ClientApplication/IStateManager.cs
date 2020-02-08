@@ -1,4 +1,6 @@
 
+using System;
+
 namespace ClientApplication
 {
     public interface IStateManager
@@ -6,5 +8,7 @@ namespace ClientApplication
         string PlayerName { get; }
 
         GameState State { get; set; }
+
+        event EventHandler GameStateChanged;
     }
 }

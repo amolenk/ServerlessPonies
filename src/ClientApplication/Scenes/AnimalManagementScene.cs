@@ -84,6 +84,9 @@ namespace Amolenk.ServerlessPonies.ClientApplication.Scenes
         {
             Phaser(interop =>
             {
+                var animal = State.Animals.Find(animal => animal.Name == @event.AnimalName);
+                animal.OwnerName = @event.OwnerName;
+
                 var buyButton = SpriteName.Create("buyButton", @event.AnimalName);
                 interop.RemoveSprite(buyButton);
             });

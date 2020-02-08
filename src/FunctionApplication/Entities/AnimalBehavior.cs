@@ -2,31 +2,33 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using Amolenk.ServerlessPonies.Messages;
+using Amolenk.ServerlessPonies.FunctionApplication.Model;
 using Microsoft.Azure.WebJobs;
 using Microsoft.Azure.WebJobs.Extensions.DurableTask;
-using Microsoft.Azure.WebJobs.Extensions.SignalRService;
 using Newtonsoft.Json;
 
 namespace Amolenk.ServerlessPonies.FunctionApplication.Entities
 {
     [JsonObject(MemberSerialization.OptIn)]
-    public class Animal : IAnimal
+    public class AnimalBehavior : IAnimalBehavior
     {
         private const double GameTimeRatio = 0.3;
 
         private readonly Random _random;
 
-        private readonly IAsyncCollector<SignalRMessage> _signalRMessages;
-
-        public Animal(IAsyncCollector<SignalRMessage> signalRMessages)
+        public AnimalBehavior()
         {
             _random = new Random();
-            _signalRMessages = signalRMessages;
         }
 
         [JsonProperty]
-        public string OwnerId { get; set; }
+        public string GameName { get; set; } 
+
+        [JsonProperty]
+        public string AnimalName { get; set; }
+
+        [JsonProperty]
+        public string OwnerName { get; set; } 
 
         [JsonProperty]
         public MoodLevel HappinessLevel { get; set; } 
@@ -40,35 +42,31 @@ namespace Amolenk.ServerlessPonies.FunctionApplication.Entities
         [JsonProperty]
         public int? DelayMoodChangeByGameMinutes { get; set; }
 
-        public Task SetOwner(string ownerId)
+        public void Start()
         {
-            OwnerId = ownerId;
-
+            HappinessLevel = new MoodLevel { Value = 1 };
             HungrinessLevel = new MoodLevel { Value = 1 };
             ThirstinessLevel = new MoodLevel { Value = 1 };
-            HappinessLevel = new MoodLevel { Value = 1 };
 
-            //ScheduleNextMoodChange(15);
-
-            return Task.CompletedTask;
+            ScheduleNextMoodChange(15);
         }
         
-        public Task BrushAsync()
+        public void Clean()
         {
-            return IncreaseMoodLevelAsync(HappinessLevel, 0.25);
+            IncreaseMoodLevel(HappinessLevel, 0.25);
         }
 
-        public Task FeedAsync()
+        public void Feed()
         {
-            return IncreaseMoodLevelAsync(HungrinessLevel, 0.25);
+            IncreaseMoodLevel(HungrinessLevel, 0.25);
         }
 
-        public Task HydrateAsync()
+        public void Water()
         {
-            return IncreaseMoodLevelAsync(ThirstinessLevel, 0.25);
+            IncreaseMoodLevel(ThirstinessLevel, 0.25);
         }
 
-        public async Task ChangeMoodRandomlyAsync()
+        public void ChangeMoodRandomly()
         {
             if (this.DelayMoodChangeByGameMinutes.HasValue)
             {
@@ -82,14 +80,14 @@ namespace Amolenk.ServerlessPonies.FunctionApplication.Entities
                 {
                     moodLevel.Decrease(_random.Next(10, 50) / (double)100);
 
-                    await PublishAnimalMoodChangedEventAsync();
+                    UpdateGameState();
 
                     ScheduleNextMoodChange(10);
                 }
             }
         }
 
-        private async Task IncreaseMoodLevelAsync(MoodLevel moodLevel, double amount)
+        private void IncreaseMoodLevel(MoodLevel moodLevel, double amount)
         {
             if (!IsCompletelySatisfied())
             {
@@ -102,7 +100,7 @@ namespace Amolenk.ServerlessPonies.FunctionApplication.Entities
                     this.DelayMoodChangeByGameMinutes = 15;
                 }
 
-                await PublishAnimalMoodChangedEventAsync();
+                UpdateGameState();
             }
         }
 
@@ -113,7 +111,7 @@ namespace Amolenk.ServerlessPonies.FunctionApplication.Entities
             Entity.Current.SignalEntity(
                 Entity.Current.EntityId,
                 triggerTime,
-                nameof(ChangeMoodRandomlyAsync));
+                nameof(ChangeMoodRandomly));
         }
 
         private MoodLevel ChooseMoodLevelToUpdate()
@@ -147,21 +145,19 @@ namespace Amolenk.ServerlessPonies.FunctionApplication.Entities
             return DateTime.UtcNow.AddSeconds(actualSeconds);
         }
 
-        private Task PublishAnimalMoodChangedEventAsync()
+        private void UpdateGameState()
         {
-            var @event = new AnimalMoodChangedEvent
+            var moodChange = new AnimalMoodChange
             {
-                AnimalId = Entity.Current.EntityKey,
-                HappinessLevel = this.HappinessLevel.Value,
-                HungrinessLevel = this.HungrinessLevel.Value,
-                ThirstinessLevel = this.ThirstinessLevel.Value
+                AnimalName = AnimalName,
+                HappinessLevel = HappinessLevel.Value,
+                HungrinessLevel = HungrinessLevel.Value,
+                ThirstinessLevel = ThirstinessLevel.Value
             };
 
-            return _signalRMessages.AddAsync(new SignalRMessage
-                {
-                    Target = "newMessage",
-                    Arguments = new[] { MessageEnvelope.Wrap(@event) }
-                });
+            var entityId = new EntityId(nameof(Game), GameName);
+            Entity.Current.SignalEntity<IGame>(entityId,
+                proxy => proxy.UpdateAnimalMoodAsync(moodChange));
         }
 
         private bool IsCompletelySatisfied()
@@ -169,19 +165,23 @@ namespace Amolenk.ServerlessPonies.FunctionApplication.Entities
                 && this.HungrinessLevel.Value == 1
                 && this.ThirstinessLevel.Value == 1;
 
-        [FunctionName(nameof(Animal))]
+        [FunctionName(nameof(AnimalBehavior))]
         public static Task Run(
-            [EntityTrigger] IDurableEntityContext context,
-            [SignalR(HubName = "ponies")] IAsyncCollector<SignalRMessage> signalRMessages)
+            [EntityTrigger] IDurableEntityContext ctx)
         {
-            // if (!context.HasState)
-            // {
-            //     context.SetState(new Animal(signalRMessages)
-            //     {
-            //     });
-            // }
+            if (!ctx.HasState)
+            {
+                var entityKeyParts = ctx.EntityKey.Split(':');
 
-            return context.DispatchAsync<Animal>(signalRMessages);
+                ctx.SetState(new AnimalBehavior
+                {
+                    GameName = entityKeyParts[0],
+                    AnimalName = entityKeyParts[1],
+                    OwnerName = entityKeyParts[2]
+                });
+            }
+            
+            return ctx.DispatchAsync<AnimalBehavior>();
         }
     }
 }

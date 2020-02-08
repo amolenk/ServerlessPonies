@@ -50,7 +50,7 @@ namespace Amolenk.ServerlessPonies.ClientApplication.Scenes
         [JSInvokable]
         public Task Animal_PointerUp(SpritePointerEventArgs e)
         {
-//            State.SelectedEnclosureId = "1";
+            State.SelectedAnimalName = SpriteName.ExtractId(e.SpriteName);
 
             Phaser(interop => interop.SwitchToScene(AnimalCareScene.Name));
 
@@ -70,11 +70,23 @@ namespace Amolenk.ServerlessPonies.ClientApplication.Scenes
 
         public void Handle(AnimalMoodChangedEvent @event)
         {
-            // TODO Update in state.
+            var animal = State.Animals.Find(animal => animal.Name == @event.AnimalName);
+            if (animal != null)
+            {
+                animal.HappinessLevel = @event.HappinessLevel;
+                animal.HungrinessLevel = @event.HungrinessLevel;
+                animal.ThirstinessLevel = @event.ThirstinessLevel;
+            }
+        }
 
-            // TODO Update on screen.
+        protected override void OnInitialized()
+        {
+            State.AnimalStateChanged += AnimalStateChanged;
+        }
 
-            Console.WriteLine($"Animal mood changed: [happiness: {@event.HappinessLevel}] [hungriness: {@event.HungrinessLevel}] [thirstiness: {@event.ThirstinessLevel}]");
+        private void AnimalStateChanged(object sender, Animal animal)
+        {
+            Console.WriteLine("Animal state changed!: " + animal.Name);
         }
 
         private void AddAnimalSprite(Animal animal)

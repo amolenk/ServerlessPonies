@@ -14,5 +14,7 @@ namespace Amolenk.ServerlessPonies.FunctionApplication.Entities
         Task PurchaseAnimalAsync(AnimalPurchase purchase);
 
         Task MoveAnimalAsync(AnimalMovement movement);
+
+        Task UpdateAnimalMoodAsync(AnimalMoodChange mood);
     }
 }

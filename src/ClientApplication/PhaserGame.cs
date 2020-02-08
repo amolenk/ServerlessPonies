@@ -9,11 +9,13 @@ namespace ClientApplication
     public class PhaserGame
     {
         private readonly IPhaserInterop _phaser;
+        private readonly IStateManager _stateManager;
         private readonly Dictionary<string, Scene> _scenes;
 
-        public PhaserGame(IPhaserInterop phaser, IEnumerable<Scene> scenes)
+        public PhaserGame(IPhaserInterop phaser, IStateManager stateManager, IEnumerable<Scene> scenes)
         {
             _phaser = phaser;
+            _stateManager = stateManager;
             _scenes = scenes.ToDictionary(scene => scene.GetName());
         }
 

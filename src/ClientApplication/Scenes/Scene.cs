@@ -22,6 +22,12 @@ namespace Amolenk.ServerlessPonies.ClientApplication.Scenes
         {
             _phaser = phaser;
             _stateManager = stateManager;
+
+            OnInitialized();
+        }
+
+        protected virtual void OnInitialized()
+        {
         }
 
         protected void Phaser(Action<IPhaserSceneInterop> interop)
@@ -29,6 +35,7 @@ namespace Amolenk.ServerlessPonies.ClientApplication.Scenes
             var scene = _phaser.Scene(this);
             if (scene.IsVisible())
             {
+                Console.WriteLine($"Scene '{this.GetName()}' is visible.");
                 interop(scene);
             }
         }

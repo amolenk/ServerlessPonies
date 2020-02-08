@@ -38,8 +38,6 @@ namespace Amolenk.ServerlessPonies.ClientApplication.Scenes
         [JSInvokable("create")]
         public override void Create()
         {
-            // TODO Set mood levels according to state.
-
             Phaser(interop => interop
                 .AddSprite(SPRITE_ANIMAL, "wally", 400, 300, options => options
                     .OnPointerMove(nameof(Animal_PointerMove))
@@ -67,6 +65,8 @@ namespace Amolenk.ServerlessPonies.ClientApplication.Scenes
                 
                 .OnPointerMove(nameof(Scene_PointerMove))
                 .OnPointerUp(nameof(Scene_PointerUp)));
+
+            UpdateMoodLevelSprites(State.SelectedAnimal());
         }
 
         [JSInvokable]
@@ -151,13 +151,28 @@ namespace Amolenk.ServerlessPonies.ClientApplication.Scenes
 
         public void Handle(AnimalMoodChangedEvent @event)
         {
+            if (@event.AnimalName == State.SelectedAnimalName)
+            {
+                var animal = State.SelectedAnimal();
+                animal.HappinessLevel = @event.HappinessLevel;
+                animal.HungrinessLevel = @event.HungrinessLevel;
+                animal.ThirstinessLevel = @event.ThirstinessLevel;
+
+                UpdateMoodLevelSprites(animal);
+            }
+        }
+
+        private void UpdateMoodLevelSprites(Animal animal)
+        {
             // TODO Use colors for mood levels
             // (https://photonstorm.github.io/phaser3-docs/Phaser.GameObjects.Sprite.html#setTint)
             Phaser(interop => 
             {
-                interop.Sprite("happinessLevel").Crop(0, 0, (int)(@event.HappinessLevel * 100), 10);
-                interop.Sprite("hungrinessLevel").Crop(0, 0, (int)(@event.HungrinessLevel * 100), 10);
-                interop.Sprite("thirstinessLevel").Crop(0, 0, (int)(@event.ThirstinessLevel * 100), 10);
+                var animal = State.SelectedAnimal();
+
+                interop.Sprite("happinessLevel").Crop(0, 0, (int)(animal.HappinessLevel * 100), 10);
+                interop.Sprite("hungrinessLevel").Crop(0, 0, (int)(animal.HungrinessLevel * 100), 10);
+                interop.Sprite("thirstinessLevel").Crop(0, 0, (int)(animal.ThirstinessLevel * 100), 10);
             });
         }
     }

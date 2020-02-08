@@ -82,12 +82,18 @@ function addRectangle(sceneName, x, y, width, height, color) {
 }
 
 function isSceneVisible(scene) {
-    return game.scene.isVisible(scene);
+    console.log('scene active: ' + scene + ' = ' + game.scene.isActive(scene));
+    console.log('scene visible: ' + scene + ' = ' + game.scene.isVisible(scene));
+    return game.scene.isActive(scene)
+        || sceneInfos[scene].isCreating;
 }
 
 function switchScene(from, to) {
+    console.log('stopping scene: ' + from);
     game.scene.stop(from);
+    console.log('starting scene: ' + to);
     game.scene.start(to);
+    console.log('scene active after start: ' + to + ' = ' + game.scene.isActive(to));
 }
 
 function startScene(scene) {
@@ -119,7 +125,9 @@ function registerScene(name, dotNetScene) {
     };
 
     phaserScene.create = function () {
+        sceneInfos[name].isCreating = true;
         dotNetScene.invokeMethod('create');
+        sceneInfos[name].isCreating = false;
     }
 }
 

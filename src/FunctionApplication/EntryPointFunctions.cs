@@ -2,7 +2,6 @@ using System;
 using System.Net;
 using System.Net.Http;
 using System.Threading.Tasks;
-using Amolenk.ServerlessPonies.FunctionApplication.Dto;
 using Amolenk.ServerlessPonies.FunctionApplication.Entities;
 using Amolenk.ServerlessPonies.FunctionApplication.Model;
 using Amolenk.ServerlessPonies.Messages;
@@ -103,14 +102,14 @@ namespace Amolenk.ServerlessPonies.FunctionApplication
             return client.SignalEntityAsync<IGame>(entityId, proxy => proxy.MoveAnimalAsync(movement));
         }
 
-        [FunctionName("AnimalState")]
-        public static async Task<HttpResponseMessage> Run(
-            [HttpTrigger(AuthorizationLevel.Function)] HttpRequestMessage req,
-            [DurableClient] IDurableEntityClient client)
-        {
-            var entityId = new EntityId(nameof(Animal), "foo");
-            EntityStateResponse<JObject> stateResponse = await client.ReadEntityStateAsync<JObject>(entityId);
-            return req.CreateResponse(HttpStatusCode.OK, stateResponse.EntityState);
-        }
+        // [FunctionName("AnimalState")]
+        // public static async Task<HttpResponseMessage> Run(
+        //     [HttpTrigger(AuthorizationLevel.Function)] HttpRequestMessage req,
+        //     [DurableClient] IDurableEntityClient client)
+        // {
+        //     var entityId = new EntityId(nameof(Animal), "foo");
+        //     EntityStateResponse<JObject> stateResponse = await client.ReadEntityStateAsync<JObject>(entityId);
+        //     return req.CreateResponse(HttpStatusCode.OK, stateResponse.EntityState);
+        // }
     }
 }

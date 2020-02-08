@@ -73,17 +73,23 @@ namespace Amolenk.ServerlessPonies.FunctionApplication.Entities
             });
         }
 
-        public Task PurchaseAnimalAsync(AnimalPurchase purchase)
+        public async Task PurchaseAnimalAsync(AnimalPurchase purchase)
         {
             // TODO Check for enough credits.
 
             AnimalStates[purchase.AnimalName].OwnerName = purchase.NewOwnerName;
 
-            return PublishEventAsync(new AnimalPurchasedEvent
+            await PublishEventAsync(new AnimalPurchasedEvent
             {
                 AnimalName = purchase.AnimalName,
                 OwnerName = purchase.NewOwnerName
             });
+
+            // Key of the animal behavior entity is:
+            // <GameName>:<AnimalName>:<OwnerName>
+            var entityKey = $"{Entity.Current.EntityKey}:{purchase.AnimalName}:{purchase.NewOwnerName}";
+            var entityId = new EntityId(nameof(AnimalBehavior), entityKey);
+            Entity.Current.SignalEntity<IAnimalBehavior>(entityId, proxy => proxy.Start());
         }
 
         public Task MoveAnimalAsync(AnimalMovement movement)
@@ -94,6 +100,22 @@ namespace Amolenk.ServerlessPonies.FunctionApplication.Entities
             {
                 AnimalName = movement.AnimalName,
                 EnclosureName = movement.NewEnclosureName
+            });
+        }
+
+        public Task UpdateAnimalMoodAsync(AnimalMoodChange mood)
+        {
+            var state = AnimalStates[mood.AnimalName];
+            state.HappinessLevel = mood.HappinessLevel;
+            state.HungrinessLevel = mood.HungrinessLevel;
+            state.ThirstinessLevel = mood.ThirstinessLevel;
+
+            return PublishEventAsync(new AnimalMoodChangedEvent
+            {
+                AnimalName = state.Name,
+                HappinessLevel = state.HappinessLevel,
+                HungrinessLevel = state.HungrinessLevel,
+                ThirstinessLevel = state.ThirstinessLevel
             });
         }
 

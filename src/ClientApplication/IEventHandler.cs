@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 
 namespace ClientApplication
 {
-    interface IEventHandler<T>
+    public interface IEventHandler<T>
     {
         void Handle(T @event);
     }

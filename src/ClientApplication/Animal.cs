@@ -16,5 +16,11 @@ namespace ClientApplication
         public string OwnerName { get; set; }
 
         public string EnclosureName { get; set; }
+
+        public double HappinessLevel { get; set; }
+
+        public double HungrinessLevel { get; set; }
+
+        public double ThirstinessLevel { get; set; }
     }
 }

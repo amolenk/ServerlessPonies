@@ -32,11 +32,19 @@ namespace ClientApplication
             return this;
         }
 
+        public PhaserGameBuilder WithEventHandler<T>(IEventHandler<T> handler)
+        {
+            return this;
+        }
+
         public PhaserGame Build()
         {
             var stateManager = new StateManager(_playerName);
 
-            return new PhaserGame(_phaser, _sceneTypes.Select(sceneType => RegisterSceneInstance(sceneType, stateManager)));
+            return new PhaserGame(
+                _phaser,
+                stateManager,
+                _sceneTypes.Select(sceneType => RegisterSceneInstance(sceneType, stateManager)));
         }
 
         private Scene RegisterSceneInstance(Type sceneType, IStateManager stateManager)

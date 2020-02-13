@@ -1,7 +1,7 @@
 
 # Get SignalR connection info
 
-POST http://localhost:7071/api/signalr/user/negotiate
+POST http://localhost:7071/api/signalr/joe/negotiate
 
 # Join a game
 POST http://localhost:7071/api/game/Foo2/join

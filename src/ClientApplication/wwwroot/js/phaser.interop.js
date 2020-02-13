@@ -172,3 +172,4 @@ function startPhaser(container, title) {
       
       game = new Phaser.Game(config);
 }
+

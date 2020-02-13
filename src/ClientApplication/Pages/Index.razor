@@ -1,5 +1,4 @@
 ﻿@page "/"
-@using Blazor.Extensions
 @using Newtonsoft.Json
 @using Newtonsoft.Json.Linq
 @using Amolenk.ServerlessPonies.Messages;
@@ -19,8 +18,6 @@
 
     const string Title = "Serverless Ponies BETA 🐴";
 
-    [Inject]
-    private HubConnectionBuilder _hubConnectionBuilder { get; set; }
 
     SignalRClient client = null;
 

@@ -2,17 +2,24 @@
 
 @inject NavigationManager NavigationManager
 
-<h1>Serverless Ponies BETA 🐴</h1>
+<div id="form-container">
+    <h1>Serverless Ponies BETA</h1>
 
-<input placeholder="player name" @bind="_playerName" />
-<button @onclick="StartGame">Start Game</button>
+    <img src="assets/logo.png" />
+
+    <p>
+        <input placeholder="player name" @bind="_playerName" />
+    </p>
+
+    <span><button @onclick="StartSinglePlayerGame">Start Single Player Game</button> <button disabled>Start Multiplayer Game</button></span>
+</div>
 
 @code {
 
     private string _playerName;
 
-    private void StartGame()
+    private void StartSinglePlayerGame()
     {
-        NavigationManager.NavigateTo("game");
+        NavigationManager.NavigateTo($"game/{_playerName}");
     }
 }

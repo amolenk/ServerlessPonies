@@ -31,7 +31,6 @@ function addSceneEventHandler(sceneName, eventName, handlerName) {
     const sceneInfo = sceneInfos[sceneName];
     sceneInfo.phaserScene.input.on(eventName, (pointer) => {
         const eventArgs = { 'x': pointer.x, 'y': pointer.y, 'distance': -1 };
-        //if (pointer.distance) eventArgs.distance = pointer.distance;
         sceneInfo.dotNetScene.invokeMethod(handlerName, eventArgs);
     });
 }
@@ -216,16 +215,8 @@ function registerScene(name, dotNetScene) {
 
     // TODO Use pack instead of hard coded: https://phaser.io/examples/v3/view/scenes/swapping-scenes
     phaserScene.preload = function () {
-        this.load.image('brush', './assets/brush.png');
-        this.load.image('logo', './assets/logo.png');
-        this.load.image('world', './assets/world.png');
-        this.load.image('wally', './assets/wally.png');
-        this.load.image('amigo', './assets/amigo.png');
         this.load.image('particle-white', './assets/white.png');
         this.load.image('particle-yellow', './assets/yellow.png');
-        this.load.image('amigo', './assets/amigo.png');
-        this.load.image('loading', './assets/loading.gif');
-        this.load.image('moodlevel', './assets/moodlevel.png');
         this.load.atlas("sprites", './assets/sprites.png', './assets/sprites.json');
     };
 
@@ -243,13 +234,12 @@ let game;
 function startPhaser(container, title) {
 
     const config = {
-        type: Phaser.WEBGL,
-        parent: container,
-        width: 1280,
-        height: 1024,
-        // scale: {
-        //     mode: Phaser.Scale.WIDTH_CONTROLS_HEIGHT
-        // },
+        type: Phaser.AUTO,
+        scale: {
+            parent: container,
+            width: 1280,
+            height: 1024
+        },
         scene: Object.keys(sceneInfos).map(key => sceneInfos[key].phaserScene),
         title: title
       };

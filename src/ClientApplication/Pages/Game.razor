@@ -1,4 +1,4 @@
-﻿@page "/game"
+﻿@page "/game/{PlayerName}"
 @using Microsoft.AspNetCore.Http.Connections
 @using Microsoft.AspNetCore.SignalR.Client
 @using System.Text.Json
@@ -19,13 +19,13 @@
 
     PhaserGame game;
 
-    protected override async Task OnAfterRenderAsync(bool firstRender)
-//    protected override async Task OnInitializedAsync()
-    {
-        var playerName = "Lisa";
+    [Parameter]
+    public string PlayerName { get; set; }
 
+    protected override async Task OnInitializedAsync()
+    {
         _hubConnection = new HubConnectionBuilder()
-            .WithUrl($"https://serverlessponies.azurewebsites.net/api/signalr/{playerName}", options =>
+            .WithUrl($"https://serverlessponies.azurewebsites.net/api/signalr/{PlayerName}", options =>
 //            .WithUrl($"http://localhost:7071/api/signalr/{playerName}", options =>
             {
                 // TODO Add reason
@@ -41,7 +41,7 @@
         var playerEventHandler = new PlayerEventHandler();
 
         game = new PhaserGameBuilder(Phaser, ServiceProvider)
-            .WithPlayerName(playerName)
+            .WithPlayerName(PlayerName)
             .WithScene<BootScene>()
             .WithScene<RanchScene>()
             .WithScene<AnimalCareScene>()

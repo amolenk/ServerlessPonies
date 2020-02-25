@@ -2,7 +2,7 @@ using Amolenk.ServerlessPonies.ClientApplication.Scenes;
 using Microsoft.JSInterop;
 using System;
 using System.Collections.Generic;
-using System.Drawing;
+//using System.Drawing;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -35,11 +35,29 @@ namespace Amolenk.ServerlessPonies.ClientApplication.Phaser
             return this;
         }
 
-        public IPhaserSceneInterop AddText(string name, double x, double y, string text, int fontSize, Color color)
+        public IPhaserSceneInterop AddText(string name, double x, double y, string text, int fontSize, string color, string style)
         {
-            var fill = $"#{color.R:X2}{color.G:X2}{color.B:X2}";
+            var fill = "black";//$"#{color.R:X2}{color.G:X2}{color.B:X2}";
 
-            _jsRuntime.InvokeVoid("addText", _scene.GetName(), name, x, y, text, $"{fontSize}px", fill);
+            _jsRuntime.InvokeVoid("addText", _scene.GetName(), name, x, y, text, $"{fontSize}px", fill, style);
+            return this;
+        }
+
+        public IPhaserSceneInterop AddText(string name, double x, double y, string text, Action<IPhaserTextInterop> options)
+        {
+            _jsRuntime.InvokeVoid("addText", _scene.GetName(), name, x, y, text, "24px", "black", null);
+
+            if (options != null)
+            {
+                options(new PhaserTextInterop(_jsRuntime, _scene.GetName(), name));
+            }
+
+            return this;
+        }
+
+        public IPhaserSceneInterop AddFireworks()
+        {
+            _jsRuntime.InvokeVoid("addFireworks", _scene.GetName());
             return this;
         }
 
@@ -100,9 +118,10 @@ namespace Amolenk.ServerlessPonies.ClientApplication.Phaser
             _jsRuntime.InvokeVoid("switchScene", _scene.GetName(), name);
         }
 
-        public void ShakeCamera()
+        public IPhaserSceneInterop ShakeCamera()
         {
             _jsRuntime.InvokeVoid("shakeCamera", _scene.GetName());
+            return this;
         }
     }
 }

@@ -47,7 +47,6 @@ namespace Amolenk.ServerlessPonies.ClientApplication.Scenes
             var scene = _phaser.Scene(this);
             if (scene.IsVisible())
             {
-                Console.WriteLine($"Scene '{this.GetName()}' is visible.");
                 interop(scene);
             }
         }
@@ -55,8 +54,6 @@ namespace Amolenk.ServerlessPonies.ClientApplication.Scenes
         public abstract string GetName();
 
         public abstract void Create();
-
-       // public abstract void Destroy();
 
         protected void SetState(GameState state)
         {

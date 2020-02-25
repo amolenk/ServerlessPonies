@@ -1,83 +1,18 @@
 ﻿@page "/"
-@using Newtonsoft.Json
-@using Newtonsoft.Json.Linq
-@using Amolenk.ServerlessPonies.Messages;
-@using Amolenk.ServerlessPonies.ClientApplication.Handlers
-@using Amolenk.ServerlessPonies.ClientApplication.Phaser
-@using Amolenk.ServerlessPonies.ClientApplication.Scenes
-@inject IJSRuntime JSRuntime;
-@inject HttpClient HttpClient;
-@inject IServiceProvider ServiceProvider;
-@inject IPhaserInterop Phaser;
 
-<h1>@Title</h1>
+@inject NavigationManager NavigationManager
 
-<div id="phaser-container"></div>
+<h1>Serverless Ponies BETA 🐴</h1>
+
+<input placeholder="player name" @bind="_playerName" />
+<button @onclick="StartGame">Start Game</button>
 
 @code {
 
-    const string Title = "Serverless Ponies BETA 🐴";
+    private string _playerName;
 
-
-    SignalRClient client = null;
-
-    PhaserGame game;
-
-    protected override async Task OnInitializedAsync()
+    private void StartGame()
     {
-        var playerName = "Lisa";
-
-        try
-        {
-            // TODO Register with IoC
-            client = new SignalRClient(JSRuntime);
-            client.EventReceived += HandleEvent;
-            await client.Start($"http://localhost:7071/api/signalr/{playerName}");
-        }
-        catch (Exception e)
-        {
-            var message = $"ERROR: Failed to start chat client: {e.Message}";
-            Console.WriteLine(e.Message);
-            Console.WriteLine(e.StackTrace);
-        }
-
-        var animalEventHandler = new AnimalEventHandler();
-        var playerEventHandler = new PlayerEventHandler();
-
-        game = new PhaserGameBuilder(Phaser, ServiceProvider)
-            .WithPlayerName(playerName)
-            .WithScene<BootScene>()
-            .WithScene<RanchScene>()
-            .WithScene<AnimalCareScene>()
-            .WithScene<AnimalPurchaseScene>()
-            .WithScene<AnimalSelectionScene>()
-            .WithScene<AnimalManagementScene>()
-            .WithScene<CreditsScene>()
-            .WithScene<SpinnerScene>()
-            .WithEventHandler<GameStartedEvent>(new GameStartedEventHandler())
-            .WithEventHandler<AnimalMoodChangedEvent>(animalEventHandler)
-            .WithEventHandler<AnimalMovedEvent>(animalEventHandler)
-            .WithEventHandler<AnimalPurchasedEvent>(animalEventHandler)
-            .WithEventHandler<AnimalPurchaseFailedEvent>(animalEventHandler)
-            .WithEventHandler<CreditsChangedEvent>(playerEventHandler)
-            .Build();
-
-        game.Start("phaser-container", Title);
-
-        await new ApiClient(HttpClient).StartSinglePlayerGame(Guid.NewGuid().ToString("N"), playerName);
-    }
-
-    // TODO HandleMessage
-    void HandleEvent(string eventName, string eventPayload)
-    {
-        // TODO Use logger
-        Console.WriteLine($"Received '{eventName}' event: {eventPayload}");
-
-        var eventTypeName = $"Amolenk.ServerlessPonies.Messages.{eventName},Messages";
-        var eventType = Type.GetType(eventTypeName);
-
-        var @event = JsonConvert.DeserializeObject(eventPayload, eventType);
-
-        game.HandleEvent(@event);
+        NavigationManager.NavigateTo("game");
     }
 }

@@ -12,6 +12,9 @@ namespace ClientApplication
 {
     public class ApiClient
     {
+        private const string BaseUrl = "https://serverlessponies.azurewebsites.net/api/";
+//        private const string BaseUrl = "http://localhost:7071/api/";
+
         private readonly HttpClient _client;
 
         public ApiClient(HttpClient client)
@@ -26,7 +29,7 @@ namespace ClientApplication
                 PlayerName = playerName
             };
 
-            return _client.SendJsonAsync(HttpMethod.Post, $"http://localhost:7071/api/game/{gameName}/join", command);
+            return _client.SendJsonAsync(HttpMethod.Post, $"{BaseUrl}game/{gameName}/join", command);
         }
 
         public Task StartSinglePlayerGame(string gameName, string playerName)
@@ -36,12 +39,12 @@ namespace ClientApplication
                 PlayerName = playerName
             };
 
-            return _client.SendJsonAsync(HttpMethod.Post, $"http://localhost:7071/api/game/{gameName}/start", command);
+            return _client.SendJsonAsync(HttpMethod.Post, $"{BaseUrl}/game/{gameName}/start", command);
         }
 
         public Task StartGame(string gameName)
         {
-            return _client.PatchAsync($"http://localhost:7071/api/game/{gameName}/start", null);
+            return _client.PatchAsync($"{BaseUrl}game/{gameName}/start", null);
         }
 
         public Task PurchaseAnimalAsync(string gameName, string animalName, string ownerName)
@@ -52,7 +55,7 @@ namespace ClientApplication
                 OwnerName = ownerName
             };
 
-            return _client.SendJsonAsync(HttpMethod.Post, $"http://localhost:7071/api/game/{gameName}/purchase-animal", command);
+            return _client.SendJsonAsync(HttpMethod.Post, $"{BaseUrl}game/{gameName}/purchase-animal", command);
         }
 
         public Task MoveAnimal(string gameName, string animalName, string enclosureName)
@@ -63,7 +66,7 @@ namespace ClientApplication
                 EnclosureName = enclosureName
             };
 
-            return _client.SendJsonAsync(HttpMethod.Post, $"http://localhost:7071/api/game/{gameName}/move-animal", command);
+            return _client.SendJsonAsync(HttpMethod.Post, $"{BaseUrl}game/{gameName}/move-animal", command);
         }
 
         public Task FeedAnimal(string gameName, string playerName, string animalName)
@@ -74,7 +77,29 @@ namespace ClientApplication
                 AnimalName = animalName
             };
 
-            return _client.SendJsonAsync(HttpMethod.Post, $"http://localhost:7071/api/game/{gameName}/feed-animal", command);
+            return _client.SendJsonAsync(HttpMethod.Post, $"{BaseUrl}game/{gameName}/feed-animal", command);
+        }
+
+        public Task WaterAnimal(string gameName, string playerName, string animalName)
+        {
+            var command = new WaterAnimalCommand
+            {
+                PlayerName = playerName,
+                AnimalName = animalName
+            };
+
+            return _client.SendJsonAsync(HttpMethod.Post, $"{BaseUrl}game/{gameName}/water-animal", command);
+        }
+
+        public Task CleanAnimal(string gameName, string playerName, string animalName)
+        {
+            var command = new CleanAnimalCommand
+            {
+                PlayerName = playerName,
+                AnimalName = animalName
+            };
+
+            return _client.SendJsonAsync(HttpMethod.Post, $"{BaseUrl}game/{gameName}/clean-animal", command);
         }
     }
 }

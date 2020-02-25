@@ -161,7 +161,7 @@ namespace Amolenk.ServerlessPonies.FunctionApplication.Entities
             return _signalRMessages.AddAsync(new SignalRMessage
                 {
                     GroupName = Entity.Current.EntityKey,
-                    Target = "handleEvent",
+                    Target = "HandleMessage",
                     Arguments = new object[] { typeof(T).Name, @event }
                 });
         }

@@ -8,6 +8,7 @@ function findSprite(sceneName, spriteName) {
         return child.type === "Sprite" && child.name === spriteName
     });
 }
+
 function findText(sceneName, textName) {
     const sceneInfo = sceneInfos[sceneName];
     return sceneInfo.phaserScene.children.list.find(child => {
@@ -51,6 +52,11 @@ function setSpriteLocation(sceneName, spriteName, x, y) {
     sprite.y = y;
 }
 
+function setSpriteTint(sceneName, spriteName, color) {
+    const sprite = findSprite(sceneName, spriteName);
+    sprite.setTint(color);
+}
+
 function spriteExists(sceneName, spriteName) {
     return findSprite(sceneName, spriteName) != null;
 }
@@ -58,6 +64,11 @@ function spriteExists(sceneName, spriteName) {
 function setTextValue(sceneName, textName, value) {
     const text = findText(sceneName, textName);
     text.setText(value);
+}
+
+function setTextOrigin(sceneName, textName, originX, originY) {
+    const text = findText(sceneName, textName);
+    text.setOrigin(originX, originY);
 }
 
 function getSpriteData(sceneName, spriteName, key) {
@@ -72,18 +83,87 @@ function setSpriteData(sceneName, spriteName, key, value) {
 
 function addSprite(sceneName, spriteName, imageName, x, y, scale = null, interactive = false) {
     const sceneInfo = sceneInfos[sceneName];
-    const sprite = sceneInfo.phaserScene.add.sprite(x, y, imageName);
+    const sprite = sceneInfo.phaserScene.add.sprite(x, y, 'sprites');
     sprite.name = spriteName; // TODO Use same strategy for scenes.
+    sprite.setFrame(imageName);
 
     if (scale) {
         sprite.setScale(scale);
     }
 }
 
-function addText(sceneName, textName, x, y, text, fontSize, fill) {
+function addText(sceneName, textName, x, y, value, fontSize, fill, style) {
     const sceneInfo = sceneInfos[sceneName];
-    const textBox = sceneInfo.phaserScene.add.text(x, y, text, { fontSize: fontSize, fill: fill });
-    textBox.name = textName;
+    const text = sceneInfo.phaserScene.add.text(x, y, value, { fontSize: fontSize, fill: fill });
+    text.name = textName;
+    text.setFontFamily('Arial');
+    text.setOrigin(0, 0.5);
+
+    if (style) {
+        text.setFontStyle(style);
+    }
+}
+
+function addFireworks(sceneName) {
+    const sceneInfo = sceneInfos[sceneName];
+
+    var p0 = new Phaser.Math.Vector2(300, 1024);
+    var p1 = new Phaser.Math.Vector2(300, 750);
+    var p2 = new Phaser.Math.Vector2(980, 750);
+    var p3 = new Phaser.Math.Vector2(980, 1024);
+
+    var curve = new Phaser.Curves.CubicBezier(p0, p1, p2, p3);
+
+    var max = 28;
+    var points = [];
+    var tangents = [];
+
+    for (var c = 0; c <= max; c++)
+    {
+        var t = curve.getUtoTmapping(c / max);
+
+        points.push(curve.getPoint(t));
+        tangents.push(curve.getTangent(t));
+    }
+
+    var tempVec = new Phaser.Math.Vector2();
+
+    var spark0 = sceneInfo.phaserScene.add.particles('particle-white');
+    var spark1 = sceneInfo.phaserScene.add.particles('particle-yellow');
+
+    var emitters = [];
+
+    for (var i = 0; i < points.length; i++)
+    {
+        var p = points[i];
+
+        tempVec.copy(tangents[i]).normalizeRightHand().scale(-32).add(p);
+
+        var angle = Phaser.Math.RadToDeg(Phaser.Math.Angle.BetweenPoints(p, tempVec));
+
+        var particles = (i % 2 === 0) ? spark0 : spark1;
+
+        emitters.push(particles.createEmitter({
+            x: tempVec.x,
+            y: tempVec.y,
+            angle: angle,
+            speed: { min: -100, max: 500 },
+            gravityY: 200,
+            scale: { start: 0.4, end: 0.1 },
+            lifespan: 800,
+            blendMode: 'SCREEN',
+            on: true
+        }));
+    }
+
+    sceneInfo.phaserScene.time.delayedCall(
+        250,
+        (emittersToStop) => {
+            for (let i = 0; i < emittersToStop.length; i++) {
+                emittersToStop[i].on = false;
+            }
+        },
+        [emitters]);
 }
 
 function removeSprite(sceneName, spriteName) {
@@ -141,8 +221,12 @@ function registerScene(name, dotNetScene) {
         this.load.image('world', './assets/world.png');
         this.load.image('wally', './assets/wally.png');
         this.load.image('amigo', './assets/amigo.png');
+        this.load.image('particle-white', './assets/white.png');
+        this.load.image('particle-yellow', './assets/yellow.png');
+        this.load.image('amigo', './assets/amigo.png');
         this.load.image('loading', './assets/loading.gif');
         this.load.image('moodlevel', './assets/moodlevel.png');
+        this.load.atlas("sprites", './assets/sprites.png', './assets/sprites.json');
     };
 
     phaserScene.create = function () {
@@ -159,13 +243,13 @@ let game;
 function startPhaser(container, title) {
 
     const config = {
-        type: Phaser.AUTO,
+        type: Phaser.WEBGL,
         parent: container,
-        width: 800,
-        height: 600,
-        scale: {
-            mode: Phaser.Scale.WIDTH_CONTROLS_HEIGHT
-        },
+        width: 1280,
+        height: 1024,
+        // scale: {
+        //     mode: Phaser.Scale.WIDTH_CONTROLS_HEIGHT
+        // },
         scene: Object.keys(sceneInfos).map(key => sceneInfos[key].phaserScene),
         title: title
       };

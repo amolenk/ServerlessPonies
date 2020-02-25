@@ -20,5 +20,11 @@ namespace Amolenk.ServerlessPonies.ClientApplication.Phaser
             _jsRuntime.InvokeVoid("setTextValue", _sceneName, _textName, text);
             return this;
         }
+
+        public IPhaserTextInterop WithOrigin(double x, double y)
+        {
+            _jsRuntime.InvokeVoid("setTextOrigin", _sceneName, _textName, x, y);
+            return this;
+        }
     }
 }

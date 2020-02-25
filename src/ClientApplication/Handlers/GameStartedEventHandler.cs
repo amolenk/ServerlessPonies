@@ -32,7 +32,10 @@ namespace Amolenk.ServerlessPonies.ClientApplication.Handlers
                         Name = animalState.Name,
                         Price = animalState.Price,
                         OwnerName = animalState.OwnerName,
-                        EnclosureName = animalState.EnclosureName
+                        EnclosureName = animalState.EnclosureName,
+                        HungrinessLevel = 1,
+                        ThirstinessLevel = 1,
+                        HappinessLevel = 1
                     })
                     .ToList()
             };

@@ -2,7 +2,7 @@ using Amolenk.ServerlessPonies.ClientApplication.Scenes;
 using Microsoft.JSInterop;
 using System;
 using System.Collections.Generic;
-using System.Drawing;
+//using System.Drawing;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -15,7 +15,11 @@ namespace Amolenk.ServerlessPonies.ClientApplication.Phaser
 
         IPhaserSceneInterop AddSprite(string name, string imageName, double x, double y, Action<IPhaserSpriteInterop> options = null);
 
-        IPhaserSceneInterop AddText(string name, double x, double y, string text, int fontSize, Color color);
+        IPhaserSceneInterop AddText(string name, double x, double y, string text, int fontSize, string color, string style = null);
+
+        IPhaserSceneInterop AddText(string name, double x, double y, string text, Action<IPhaserTextInterop> options = null);
+
+        IPhaserSceneInterop AddFireworks();
 
         IPhaserSceneInterop RemoveSprite(string name);
 
@@ -39,6 +43,6 @@ namespace Amolenk.ServerlessPonies.ClientApplication.Phaser
 
         void SwitchToScene(string name);
 
-        void ShakeCamera();
+        IPhaserSceneInterop ShakeCamera();
     }
 }

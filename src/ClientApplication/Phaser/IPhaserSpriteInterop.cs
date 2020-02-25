@@ -18,6 +18,8 @@ namespace Amolenk.ServerlessPonies.ClientApplication.Phaser
 
         IPhaserSpriteInterop Scale(double scale);
 
+        IPhaserSpriteInterop Tint(string color);
+
         IPhaserSpriteInterop OnPointerUp(string handlerName);
 
         IPhaserSpriteInterop OnPointerDown(string handlerName);

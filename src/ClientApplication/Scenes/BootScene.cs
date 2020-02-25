@@ -1,3 +1,5 @@
+using Amolenk.ServerlessPonies.ClientApplication.Model;
+using ClientApplication;
 using Microsoft.JSInterop;
 using System;
 
@@ -7,25 +9,35 @@ namespace Amolenk.ServerlessPonies.ClientApplication.Scenes
     {
         public const string Name = "Boot";
 
+        private readonly ApiClient _apiClient;
+
+        public BootScene(ApiClient apiClient)
+        {
+            _apiClient = apiClient;
+        }
+        
         public override string GetName() => Name;
 
         [JSInvokable("create")]
         public override void Create()
         {
-            Phaser(interop => interop.AddSprite("spinner", "logo", 400, 300));
+            Phaser(interop => interop.AddSprite("sprLogo", "misc/logo", 640, 512));
 
-            StateManager.GameStateChanged += (sender, e) =>
+            _apiClient.StartSinglePlayerGame(Guid.NewGuid().ToString("N"), StateManager.PlayerName);
+        }
+
+        protected override void StateChanged(GameState state)
+        {
+            // TODO Double check GameName as well?
+            if (StateManager.State.IsStarted)
             {
-                Console.WriteLine("BootScene: GameStateChanged");
-
-                // TODO Double check GameName as well?
-                if (StateManager.State.IsStarted)
-                {
-                    Phaser(interop => interop
-                        .StartScene(CreditsScene.Name)
-                        .SwitchToScene(RanchScene.Name));
-                }
-            };
+                Phaser(interop => interop
+                    .StartScene(CreditsScene.Name)
+                    .SwitchToScene(RanchScene.Name));
+            }
         }
     }
 }
+
+
+

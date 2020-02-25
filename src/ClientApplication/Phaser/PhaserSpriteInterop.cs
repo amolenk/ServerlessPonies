@@ -44,6 +44,12 @@ namespace Amolenk.ServerlessPonies.ClientApplication.Phaser
             return this;
         }
 
+        public IPhaserSpriteInterop Tint(string color)
+        {
+            _jsRuntime.InvokeVoid("setSpriteTint", _sceneName, _spriteName, color);
+            return this;
+        }
+
         public IPhaserSpriteInterop OnPointerUp(string handlerName)
         {
             _jsRuntime.InvokeVoid("addSpriteEventHandler", _sceneName, _spriteName, "pointerup", handlerName);

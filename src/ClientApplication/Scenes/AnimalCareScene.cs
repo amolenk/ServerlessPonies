@@ -28,29 +28,35 @@ namespace Amolenk.ServerlessPonies.ClientApplication.Scenes
         public override void Create()
         {
             Phaser(interop => interop
-                .AddSprite("sprAnimal", "wally", 400, 300, options => options
+
+                .AddSprite("sprBackground", "backgrounds/animal-care", 640, 512)
+
+                .AddSprite("sprBack", "misc/board", 180, 60)
+                .AddSprite("btnBack", "misc/back", 165, 95, options => options
+                    .OnPointerUp(nameof(btnBack_PointerUp)))
+
+                .AddSprite("sprAnimal", $"animals/{State.SelectedAnimal().Name}/side", 750, 750, options => options
                     .OnPointerMove(nameof(Animal_PointerMove))
                     .OnPointerUp(nameof(Animal_PointerUp)))
-                
-                .AddSprite("sprHappiness", "moodlevel", 150, 50)
-                .AddSprite("sprHungriness", "moodlevel", 150, 70)
-                .AddSprite("sprThirstiness", "moodlevel", 150, 90)
 
-                .AddSprite("btnClean", "brush", 50, 150, options => options
-                    .Scale(0.1)
-                    .OnPointerDown(nameof(CleanButton_PointerDown)))
-                
-                .AddSprite("btnFeed", "logo", 50, 200, options => options
-                    .Scale(0.1)
-                    .OnPointerDown(nameof(FeedButton_PointerDown)))
-                
-                .AddSprite("btnWater", "logo", 50, 250, options => options
-                    .Scale(0.1)
+                .AddSprite("sprMoodBackground", "misc/mood-bg", 640, 940)
+
+                .AddSprite("sprHappinessLevelBackground", "misc/mood-level-bg", 490, 955)
+                .AddSprite("sprHungrinessLevelBackground", "misc/mood-level-bg", 640, 955)
+                .AddSprite("sprThirstinessLevelBackground", "misc/mood-level-bg", 790, 955)
+
+                .AddSprite("sprHungrinessLevel", "misc/mood-level", 490, 955)
+                .AddSprite("sprThirstinessLevel", "misc/mood-level", 640, 955)
+                .AddSprite("sprHappinessLevel", "misc/mood-level", 790, 955)
+
+                .AddSprite("btnFeed", "actions/feed", 490, 890, options => options
+                    .OnPointerDown(nameof(FeedButton_PointerDown))) 
+
+                .AddSprite("btnWater", "actions/water", 640, 890, options => options
                     .OnPointerDown(nameof(WaterButton_PointerDown)))
-
-                .AddSprite("btnBack", "logo", 700, 100, options => options
-                    .Scale(0.3)
-                    .OnPointerUp(nameof(btnBack_PointerUp)))
+                
+                .AddSprite("btnClean", "actions/clean", 790, 890, options => options
+                    .OnPointerDown(nameof(CleanButton_PointerDown)))
 
                 .OnPointerMove(nameof(Scene_PointerMove))
                 .OnPointerUp(nameof(Scene_PointerUp)));
@@ -72,7 +78,11 @@ namespace Amolenk.ServerlessPonies.ClientApplication.Scenes
                 _cleaningPoints += e.Distance;
                 if (_cleaningPoints >= 10000)
                 {
-                    Console.WriteLine("Cleaning points!");
+                    _apiClient.CleanAnimal(
+                        StateManager.State.GameName,
+                        StateManager.PlayerName,
+                        StateManager.State.SelectedAnimalName);
+
                     _cleaningPoints = 0;
                 }
             }
@@ -87,12 +97,13 @@ namespace Amolenk.ServerlessPonies.ClientApplication.Scenes
                     StateManager.State.GameName,
                     StateManager.PlayerName,
                     StateManager.State.SelectedAnimalName);
-
-                Console.WriteLine("Feeding points!");
             }
             else if (_activitySprite == "sprWater")
             {
-                Console.WriteLine("Watering points!");
+                _apiClient.WaterAnimal(
+                    StateManager.State.GameName,
+                    StateManager.PlayerName,
+                    StateManager.State.SelectedAnimalName);
             }
         }
 
@@ -100,8 +111,7 @@ namespace Amolenk.ServerlessPonies.ClientApplication.Scenes
         public void CleanButton_PointerDown(SpritePointerEventArgs e)
         {
             Phaser(interop => interop
-                .AddSprite("sprClean", "brush", e.X, e.Y, options => options
-                    .Scale(0.15)));
+                .AddSprite("sprClean", "actions/clean-item", e.X, e.Y));
 
             _activitySprite = "sprClean";
             _cleaningPoints = 0;
@@ -111,10 +121,18 @@ namespace Amolenk.ServerlessPonies.ClientApplication.Scenes
         public void FeedButton_PointerDown(SpritePointerEventArgs e)
         {
             Phaser(interop => interop
-                .AddSprite("sprFeed", "logo", e.X, e.Y, options => options
-                    .Scale(0.15)));
+                .AddSprite("sprFeed", "actions/feed-item", e.X, e.Y));
 
             _activitySprite = "sprFeed";
+        }
+
+        [JSInvokable]
+        public void WaterButton_PointerDown(SpritePointerEventArgs e)
+        {
+            Phaser(interop => interop
+                .AddSprite("sprWater", "actions/water-item", e.X, e.Y));
+
+            _activitySprite = "sprWater";
         }
 
         [JSInvokable]
@@ -131,16 +149,6 @@ namespace Amolenk.ServerlessPonies.ClientApplication.Scenes
         {
             Phaser(interop => interop.RemoveSprite(_activitySprite));
             _activitySprite = null;
-        }
-
-        [JSInvokable]
-        public void WaterButton_PointerDown(SpritePointerEventArgs e)
-        {
-            Phaser(interop => interop
-                .AddSprite("sprWater", "logo", e.X, e.Y, options => options
-                    .Scale(0.15)));
-
-            _activitySprite = "sprWater";
         }
 
         public void Handle(AnimalMoodChangedEvent @event)
@@ -173,19 +181,31 @@ namespace Amolenk.ServerlessPonies.ClientApplication.Scenes
 
         private void UpdateMoodLevelSprites(Animal animal)
         {
-            // TODO Use colors for mood levels
-            // (https://photonstorm.github.io/phaser3-docs/Phaser.GameObjects.Sprite.html#setTint)
             Phaser(interop => 
             {
-                var animal = State.SelectedAnimal();
+                interop.Sprite("sprHungrinessLevel")
+                    .Crop(0, 0, CalculateMoodLevelWidth(animal.HungrinessLevel), 10)
+                    .Tint(ResolveMoodLevelColor(animal.HungrinessLevel));
 
-                Console.WriteLine(animal.Name);
-                Console.WriteLine(animal.ThirstinessLevel);
+                interop.Sprite("sprThirstinessLevel")
+                    .Crop(0, 0, CalculateMoodLevelWidth(animal.ThirstinessLevel), 10)
+                    .Tint(ResolveMoodLevelColor(animal.ThirstinessLevel));
 
-                interop.Sprite("sprHappiness").Crop(0, 0, (int)(animal.HappinessLevel * 100), 10);
-                interop.Sprite("sprHungriness").Crop(0, 0, (int)(animal.HungrinessLevel * 100), 10);
-                interop.Sprite("sprThirstiness").Crop(0, 0, (int)(animal.ThirstinessLevel * 100), 10);
+                interop.Sprite("sprHappinessLevel")
+                    .Crop(0, 0, CalculateMoodLevelWidth(animal.HappinessLevel), 10)
+                    .Tint(ResolveMoodLevelColor(animal.HappinessLevel));
+
+                if (animal.HungrinessLevel == 1)
+                {
+                    interop.AddFireworks();
+                }
             });
         }
+
+        private int CalculateMoodLevelWidth(double moodLevel)
+            => Math.Max(2, Math.Min(98, (int)(moodLevel * 100)));
+
+        private string ResolveMoodLevelColor(double moodLevel)
+            => moodLevel > 0.7 ? "0x28bb25" : moodLevel < 0.3 ? "0xd81919" : "0xd9be2b";
     }
 }

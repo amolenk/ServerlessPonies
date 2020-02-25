@@ -34,18 +34,6 @@ namespace ClientApplication
             {
                 handler(@event, _stateManager);
             }
-
-
-            // foreach (var scene in _scenes.Values)
-            // {
-            //     var sceneType = scene.GetType();
-            //     if (handlerType.IsAssignableFrom(sceneType))
-            //     {
-            //         sceneType.InvokeMember("Handle",
-            //             BindingFlags.Instance | BindingFlags.InvokeMethod | BindingFlags.Public,
-            //             null, scene, new [] { @event });
-            //     }
-            // }
         }
     }
 }

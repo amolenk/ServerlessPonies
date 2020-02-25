@@ -11,5 +11,7 @@ namespace Amolenk.ServerlessPonies.ClientApplication.Phaser
     public interface IPhaserTextInterop
     {
         IPhaserTextInterop Value(string text);
+
+        IPhaserTextInterop WithOrigin(double x, double y);
     }
 }

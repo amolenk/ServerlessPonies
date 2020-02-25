@@ -11,8 +11,6 @@ namespace ClientApplication
         public static Task Main(string[] args)
         {
             var builder = CreateHostBuilder(args);
-            
-            builder.RootComponents.Add<App>("app");
 
             builder.Services
                 .AddTransient<IPhaserInterop, PhaserInterop>()
@@ -21,10 +19,10 @@ namespace ClientApplication
                 .AddTransient<CreditsScene>()
                 .AddTransient<RanchScene>()
                 .AddTransient<AnimalManagementScene>()
-                .AddTransient<AnimalPurchaseScene>()
-                .AddTransient<AnimalSelectionScene>()
                 .AddTransient<AnimalCareScene>()
                 .AddTransient<SpinnerScene>();
+
+            builder.RootComponents.Add<App>("app");
 
             return builder.Build().RunAsync();
         }

@@ -49,6 +49,7 @@ namespace Amolenk.ServerlessPonies.FunctionApplication
             [HttpTrigger(AuthorizationLevel.Anonymous, "POST", Route = "game/{gameName}/start")] StartSinglePlayerGameCommand command,
             [DurableClient] IDurableEntityClient client,
             [SignalR(HubName = "ponies")] IAsyncCollector<SignalRGroupAction> signalRGroupActions,
+            [SignalR(HubName = "ponies")] IAsyncCollector<SignalRMessage> signalRMessages,
             string gameName)
         {
             await signalRGroupActions.AddAsync(new SignalRGroupAction
@@ -112,14 +113,24 @@ namespace Amolenk.ServerlessPonies.FunctionApplication
             return client.SignalEntityAsync<IAnimalBehavior>(entityId, proxy => proxy.Feed());
         }
 
-        // [FunctionName("AnimalState")]
-        // public static async Task<HttpResponseMessage> Run(
-        //     [HttpTrigger(AuthorizationLevel.Function)] HttpRequestMessage req,
-        //     [DurableClient] IDurableEntityClient client)
-        // {
-        //     var entityId = new EntityId(nameof(Animal), "foo");
-        //     EntityStateResponse<JObject> stateResponse = await client.ReadEntityStateAsync<JObject>(entityId);
-        //     return req.CreateResponse(HttpStatusCode.OK, stateResponse.EntityState);
-        // }
+        [FunctionName("WaterAnimal")]
+        public static Task WaterAnimal(
+            [HttpTrigger(AuthorizationLevel.Anonymous, "POST", Route = "game/{gameName}/water-animal")] WaterAnimalCommand command,
+            [DurableClient] IDurableEntityClient client,
+            string gameName)
+        {
+            var entityId = new EntityId(nameof(AnimalBehavior), $"{gameName}:{command.AnimalName}:{command.PlayerName}");
+            return client.SignalEntityAsync<IAnimalBehavior>(entityId, proxy => proxy.Water());
+        }
+
+        [FunctionName("CleanAnimal")]
+        public static Task CleanAnimal(
+            [HttpTrigger(AuthorizationLevel.Anonymous, "POST", Route = "game/{gameName}/clean-animal")] CleanAnimalCommand command,
+            [DurableClient] IDurableEntityClient client,
+            string gameName)
+        {
+            var entityId = new EntityId(nameof(AnimalBehavior), $"{gameName}:{command.AnimalName}:{command.PlayerName}");
+            return client.SignalEntityAsync<IAnimalBehavior>(entityId, proxy => proxy.Clean());
+        }
     }
 }

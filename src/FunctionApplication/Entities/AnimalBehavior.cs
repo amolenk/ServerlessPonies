@@ -12,6 +12,10 @@ namespace Amolenk.ServerlessPonies.FunctionApplication.Entities
     [JsonObject(MemberSerialization.OptIn)]
     public class AnimalBehavior : IAnimalBehavior
     {
+        private const int PointsNeededForExtraCredits = 5;
+
+        private const int ExtraCredits = 100;
+
         private const double GameTimeRatio = 0.3;
 
         private readonly Random _random;
@@ -43,6 +47,9 @@ namespace Amolenk.ServerlessPonies.FunctionApplication.Entities
         public MoodLevel ThirstinessLevel { get; set; }
 
         [JsonProperty]
+        public int CreditPoints { get; set; }
+
+        [JsonProperty]
         public int? DelayMoodChangeByGameMinutes { get; set; }
 
         public void Start()
@@ -51,6 +58,7 @@ namespace Amolenk.ServerlessPonies.FunctionApplication.Entities
             HappinessLevel = new MoodLevel { Value = 1 };
             HungrinessLevel = new MoodLevel { Value = 1 };
             ThirstinessLevel = new MoodLevel { Value = 1 };
+            CreditPoints = 0;
 
             ScheduleNextMoodChange(15);
         }
@@ -93,18 +101,28 @@ namespace Amolenk.ServerlessPonies.FunctionApplication.Entities
                 {
                     moodLevel.Decrease(_random.Next(10, 50) / (double)100);
 
-                    UpdateGameState();
+                    UpdateAnimalMoodGameState();
 
-                    ScheduleNextMoodChange(10);
+                    if (!IsCompletelyUnsatisfied())
+                    {
+                        ScheduleNextMoodChange(10);
+                    }
                 }
             }
         }
 
         private void IncreaseMoodLevel(MoodLevel moodLevel, double amount)
         {
-            if (!IsCompletelySatisfied())
+            if (moodLevel.Value < 1)
             {
+                // If we're at rock bottom, start scheduling mood changes again.
+                if (IsCompletelyUnsatisfied())
+                {
+                    ScheduleNextMoodChange(30);
+                }
+
                 moodLevel.Increase(amount);
+                UpdateAnimalMoodGameState();
 
                 // If the animal is now completely satisfied, delay the next mood
                 // change by 15 game minutes to give the player some rest.
@@ -113,7 +131,12 @@ namespace Amolenk.ServerlessPonies.FunctionApplication.Entities
                     this.DelayMoodChangeByGameMinutes = 15;
                 }
 
-                UpdateGameState();
+                if (++this.CreditPoints >= PointsNeededForExtraCredits
+                    && IsSatisfied())
+                {
+                    DepositCreditsToGameState(ExtraCredits);
+                    this.CreditPoints = 0;
+                }
             }
         }
 
@@ -158,7 +181,7 @@ namespace Amolenk.ServerlessPonies.FunctionApplication.Entities
             return DateTime.UtcNow.AddSeconds(actualSeconds);
         }
 
-        private void UpdateGameState()
+        private void UpdateAnimalMoodGameState()
         {
             var moodChange = new AnimalMoodChange
             {
@@ -173,10 +196,33 @@ namespace Amolenk.ServerlessPonies.FunctionApplication.Entities
                 proxy => proxy.UpdateAnimalMoodAsync(moodChange));
         }
 
+        private void DepositCreditsToGameState(int amount)
+        {
+            var creditsDeposit = new CreditsDeposit
+            {
+                PlayerName = OwnerName,
+                Amount = amount
+            };
+
+            var entityId = new EntityId(nameof(Game), GameName);
+            Entity.Current.SignalEntity<IGame>(entityId,
+                proxy => proxy.DepositCreditsAsync(creditsDeposit));
+        }
+
+        private bool IsSatisfied()
+            => this.HappinessLevel.Value >= 0.7
+                && this.HungrinessLevel.Value >= 0.7
+                && this.ThirstinessLevel.Value >= 0.7;
+
         private bool IsCompletelySatisfied()
             => this.HappinessLevel.Value == 1
                 && this.HungrinessLevel.Value == 1
                 && this.ThirstinessLevel.Value == 1;
+
+        private bool IsCompletelyUnsatisfied()
+            => this.HappinessLevel.Value == 0
+                && this.HungrinessLevel.Value == 0
+                && this.ThirstinessLevel.Value == 0;
 
         [FunctionName(nameof(AnimalBehavior))]
         public static Task Run(

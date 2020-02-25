@@ -1,7 +1,10 @@
-﻿using System.Threading.Tasks;
+﻿using System;
+using System.Collections.Generic;
+using System.Threading.Tasks;
 using Amolenk.ServerlessPonies.ClientApplication.Phaser;
 using Amolenk.ServerlessPonies.ClientApplication.Scenes;
 using Microsoft.AspNetCore.Blazor.Hosting;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace ClientApplication
@@ -21,6 +24,12 @@ namespace ClientApplication
                 .AddTransient<AnimalManagementScene>()
                 .AddTransient<AnimalCareScene>()
                 .AddTransient<SpinnerScene>();
+
+            builder.Configuration.AddInMemoryCollection(new Dictionary<string, string>
+            {
+                { "FunctionsBaseUrl", "https://serverlessponies.azurewebsites.net/" }
+               //{ "FunctionsBaseUrl", "http://localhost:7071/" }
+            });
 
             builder.RootComponents.Add<App>("app");
 

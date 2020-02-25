@@ -2,13 +2,14 @@
 @using Microsoft.AspNetCore.Http.Connections
 @using Microsoft.AspNetCore.SignalR.Client
 @using System.Text.Json
-@using System.Text.Json.Serialization
+@using Microsoft.Extensions.Configuration
 @using Amolenk.ServerlessPonies.Messages;
 @using Amolenk.ServerlessPonies.ClientApplication.Handlers
 @using Amolenk.ServerlessPonies.ClientApplication.Phaser
 @using Amolenk.ServerlessPonies.ClientApplication.Scenes
 @inject IJSRuntime JSRuntime;
 @inject HttpClient HttpClient;
+@inject IConfiguration Configuration
 @inject IServiceProvider ServiceProvider;
 @inject IPhaserInterop Phaser;
 
@@ -25,8 +26,7 @@
     protected override async Task OnInitializedAsync()
     {
         _hubConnection = new HubConnectionBuilder()
-            .WithUrl($"https://serverlessponies.azurewebsites.net/api/signalr/{PlayerName}", options =>
-//            .WithUrl($"http://localhost:7071/api/signalr/{playerName}", options =>
+            .WithUrl($"{Configuration.GetValue<string>("FunctionsBaseUrl")}api/signalr/{PlayerName}", options =>
             {
                 // TODO Add reason
                 options.Transports = HttpTransportType.LongPolling;

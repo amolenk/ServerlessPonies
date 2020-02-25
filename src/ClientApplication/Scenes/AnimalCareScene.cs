@@ -177,6 +177,15 @@ namespace Amolenk.ServerlessPonies.ClientApplication.Scenes
                     }
                 };
             }
+
+            var player = StateManager.State.FindPlayer(StateManager.PlayerName);
+            player.CreditsChanged += (sender, args) =>
+            {
+                if (args.Delta > 0)
+                {
+                    Phaser(interop => interop.AddFireworks());
+                }
+            };
         }
 
         private void UpdateMoodLevelSprites(Animal animal)
@@ -194,11 +203,6 @@ namespace Amolenk.ServerlessPonies.ClientApplication.Scenes
                 interop.Sprite("sprHappinessLevel")
                     .Crop(0, 0, CalculateMoodLevelWidth(animal.HappinessLevel), 10)
                     .Tint(ResolveMoodLevelColor(animal.HappinessLevel));
-
-                if (animal.HungrinessLevel == 1)
-                {
-                    interop.AddFireworks();
-                }
             });
         }
 

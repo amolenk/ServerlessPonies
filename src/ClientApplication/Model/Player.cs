@@ -16,8 +16,9 @@ namespace Amolenk.ServerlessPonies.ClientApplication.Model
             {
                 if (value != _credits)
                 {
+                    var delta = value - _credits;
                     _credits = value;
-                    CreditsChanged?.Invoke(this, new CreditsChangedEventArgs(_credits));
+                    CreditsChanged?.Invoke(this, new CreditsChangedEventArgs(_credits, delta));
                 }
             }
         }

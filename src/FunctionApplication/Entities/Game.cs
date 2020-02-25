@@ -149,6 +149,18 @@ namespace Amolenk.ServerlessPonies.FunctionApplication.Entities
             });
         }
 
+        public Task DepositCreditsAsync(CreditsDeposit deposit)
+        {
+            var state = PlayerStates[deposit.PlayerName];
+            state.Credits += deposit.Amount;
+
+            return PublishEventAsync(new CreditsChangedEvent
+            {
+                PlayerName = deposit.PlayerName,
+                Credits = state.Credits
+            });
+        }
+
         private void AddPlayer(string playerName)
         {
             var playerState = Model.PlayerState.Default(playerName);

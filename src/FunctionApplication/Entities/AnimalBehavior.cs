@@ -128,11 +128,15 @@ namespace Amolenk.ServerlessPonies.FunctionApplication.Entities
                 // change by 15 game minutes to give the player some rest.
                 if (IsCompletelySatisfied())
                 {
+                    this.DelayMoodChangeByGameMinutes = 60;
+                }
+                else
+                {
                     this.DelayMoodChangeByGameMinutes = 15;
                 }
 
-                if (++this.CreditPoints >= PointsNeededForExtraCredits
-                    && IsSatisfied())
+                if (//++this.CreditPoints >= PointsNeededForExtraCredits
+                    /*&&*/ IsSatisfied())
                 {
                     DepositCreditsToGameState(ExtraCredits);
                     this.CreditPoints = 0;

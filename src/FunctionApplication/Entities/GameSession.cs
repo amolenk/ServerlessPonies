@@ -10,11 +10,11 @@ using Newtonsoft.Json;
 namespace Amolenk.ServerlessPonies.FunctionApplication.Entities
 {
     [JsonObject(MemberSerialization.OptIn)]
-    public class Game : IGame
+    public class GameSession : IGameSession
     {
         private readonly IAsyncCollector<SignalRMessage> _signalRMessages;
 
-        public Game(IAsyncCollector<SignalRMessage> signalRMessages)
+        public GameSession(IAsyncCollector<SignalRMessage> signalRMessages)
         {
             _signalRMessages = signalRMessages;
 
@@ -39,16 +39,6 @@ namespace Amolenk.ServerlessPonies.FunctionApplication.Entities
             }
 
             // TODO What else?
-        }
-
-        public Task Start()
-        {
-            IsStarted = true;
-
-            return PublishEventAsync(new GameStartedEvent
-            {
-                GameName = Entity.Current.EntityName
-            });
         }
 
         public Task StartSinglePlayer(string playerName)
@@ -178,9 +168,9 @@ namespace Amolenk.ServerlessPonies.FunctionApplication.Entities
                 });
         }
 
-        [FunctionName(nameof(Game))]
+        [FunctionName(nameof(GameSession))]
         public static Task Run([EntityTrigger] IDurableEntityContext ctx,
             [SignalR(HubName = "ponies")] IAsyncCollector<SignalRMessage> signalRMessages)
-            => ctx.DispatchAsync<Game>(signalRMessages);
+            => ctx.DispatchAsync<GameSession>(signalRMessages);
     }
 }

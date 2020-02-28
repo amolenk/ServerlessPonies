@@ -3,12 +3,8 @@ using Amolenk.ServerlessPonies.FunctionApplication.Model;
 
 namespace Amolenk.ServerlessPonies.FunctionApplication.Entities
 {
-    public interface IGame
+    public interface IGameSession
     {
-        void Join(string playerName);
-
-        Task Start();
-
         Task StartSinglePlayer(string playerName);
 
         Task PurchaseAnimalAsync(AnimalPurchase purchase);

@@ -1,55 +1,21 @@
-using System;
-using System.Net;
-using System.Net.Http;
 using System.Threading.Tasks;
 using Amolenk.ServerlessPonies.FunctionApplication.Entities;
 using Amolenk.ServerlessPonies.FunctionApplication.Model;
 using Amolenk.ServerlessPonies.Messages;
-using Microsoft.AspNetCore.Http;
 using Microsoft.Azure.WebJobs;
 using Microsoft.Azure.WebJobs.Extensions.DurableTask;
 using Microsoft.Azure.WebJobs.Extensions.Http;
 using Microsoft.Azure.WebJobs.Extensions.SignalRService;
-using Microsoft.Extensions.Logging;
-using Newtonsoft.Json.Linq;
 
 namespace Amolenk.ServerlessPonies.FunctionApplication
 {
     public class EntryPointFunctions
     {
-        private readonly IEventPublisher _eventPublisher;
-
-        public EntryPointFunctions(IEventPublisher eventPublisher)
-        {
-            _eventPublisher = eventPublisher;
-        }
-
-        [FunctionName("JoinGame")]
-        public static Task JoinGame(
-            [HttpTrigger(AuthorizationLevel.Anonymous, "POST", Route = "game/{gameName}/join")] JoinGameCommand command,
-            [DurableClient] IDurableEntityClient client,
-            string gameName)
-        {
-            var entityId = new EntityId(nameof(Game), gameName);
-            return client.SignalEntityAsync<IGame>(entityId, proxy => proxy.Join(command.PlayerName));
-        }
-
-        [FunctionName("StartGame")]
-        public static Task StartGame(
-            [HttpTrigger(AuthorizationLevel.Anonymous, "PATCH", Route = "game/{gameName}/start")] HttpRequest request,
-            [DurableClient] IDurableEntityClient client,
-            string gameName)
-        {
-            var entityId = new EntityId(nameof(Game), gameName);
-            return client.SignalEntityAsync<IGame>(entityId, proxy => proxy.Start());
-        }
-        
         [FunctionName("StartSinglePlayerGame")]
         public static async Task StartSinglePlayerGame(
             [HttpTrigger(AuthorizationLevel.Anonymous, "POST", Route = "game/{gameName}/start")] StartSinglePlayerGameCommand command,
             [DurableClient] IDurableEntityClient client,
             [SignalR(HubName = "ponies")] IAsyncCollector<SignalRGroupAction> signalRGroupActions,
-            [SignalR(HubName = "ponies")] IAsyncCollector<SignalRMessage> signalRMessages,
             string gameName)
         {
             await signalRGroupActions.AddAsync(new SignalRGroupAction
@@ -59,16 +25,8 @@ namespace Amolenk.ServerlessPonies.FunctionApplication
                 Action = GroupAction.Add
             });
 
-            var entityId = new EntityId(nameof(Game), gameName);
-            await client.SignalEntityAsync<IGame>(entityId, proxy => proxy.StartSinglePlayer(command.PlayerName));
-        }
-
-        [FunctionName("Ping")]
-        public static void Ping(
-            [HttpTrigger(AuthorizationLevel.Anonymous, "GET")] HttpRequest req,
-            ILogger log)
-        {
-            log.LogInformation($"Received PING request.");
+            var entityId = new EntityId(nameof(GameSession), gameName);
+            await client.SignalEntityAsync<IGameSession>(entityId, proxy => proxy.StartSinglePlayer(command.PlayerName));
         }
 
         [FunctionName("PurchaseAnimal")]
@@ -83,8 +41,8 @@ namespace Amolenk.ServerlessPonies.FunctionApplication
                 NewOwnerName = command.OwnerName
             };
 
-            var entityId = new EntityId(nameof(Game), gameName);
-            return client.SignalEntityAsync<IGame>(entityId, proxy => proxy.PurchaseAnimalAsync(transfer));
+            var entityId = new EntityId(nameof(GameSession), gameName);
+            return client.SignalEntityAsync<IGameSession>(entityId, proxy => proxy.PurchaseAnimalAsync(transfer));
         }
 
         [FunctionName("MoveAnimal")]
@@ -99,8 +57,8 @@ namespace Amolenk.ServerlessPonies.FunctionApplication
                 NewEnclosureName = command.EnclosureName
             };
 
-            var entityId = new EntityId(nameof(Game), gameName);
-            return client.SignalEntityAsync<IGame>(entityId, proxy => proxy.MoveAnimalAsync(movement));
+            var entityId = new EntityId(nameof(GameSession), gameName);
+            return client.SignalEntityAsync<IGameSession>(entityId, proxy => proxy.MoveAnimalAsync(movement));
         }
 
         [FunctionName("FeedAnimal")]

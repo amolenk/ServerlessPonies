@@ -195,8 +195,8 @@ namespace Amolenk.ServerlessPonies.FunctionApplication.Entities
                 ThirstinessLevel = ThirstinessLevel.Value
             };
 
-            var entityId = new EntityId(nameof(Game), GameName);
-            Entity.Current.SignalEntity<IGame>(entityId,
+            var entityId = new EntityId(nameof(GameSession), GameName);
+            Entity.Current.SignalEntity<IGameSession>(entityId,
                 proxy => proxy.UpdateAnimalMoodAsync(moodChange));
         }
 
@@ -208,8 +208,8 @@ namespace Amolenk.ServerlessPonies.FunctionApplication.Entities
                 Amount = amount
             };
 
-            var entityId = new EntityId(nameof(Game), GameName);
-            Entity.Current.SignalEntity<IGame>(entityId,
+            var entityId = new EntityId(nameof(GameSession), GameName);
+            Entity.Current.SignalEntity<IGameSession>(entityId,
                 proxy => proxy.DepositCreditsAsync(creditsDeposit));
         }
 

@@ -7,8 +7,7 @@ using System;
 
 namespace Amolenk.ServerlessPonies.ClientApplication.Scenes
 {
-    public class AnimalCareScene : Scene,
-        IEventHandler<AnimalMoodChangedEvent>
+    public class AnimalCareScene : Scene
     {
         public const string Name = "AnimalCare";
 
@@ -149,19 +148,6 @@ namespace Amolenk.ServerlessPonies.ClientApplication.Scenes
         {
             Phaser(interop => interop.RemoveSprite(_activitySprite));
             _activitySprite = null;
-        }
-
-        public void Handle(AnimalMoodChangedEvent @event)
-        {
-            if (@event.AnimalName == State.SelectedAnimalName)
-            {
-                var animal = State.SelectedAnimal();
-                animal.HappinessLevel = @event.HappinessLevel;
-                animal.HungrinessLevel = @event.HungrinessLevel;
-                animal.ThirstinessLevel = @event.ThirstinessLevel;
-
-                UpdateMoodLevelSprites(animal);
-            }
         }
 
         // TODO Rename to WireStateHandlers?

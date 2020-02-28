@@ -11,7 +11,7 @@ using System.Threading.Tasks;
 
 namespace Amolenk.ServerlessPonies.ClientApplication.Handlers
 {
-    public class GameStartedEventHandler : IEventHandler2<GameStartedEvent>
+    public class GameStartedEventHandler : IEventHandler<GameStartedEvent>
     {
         public void Handle(GameStartedEvent @event, IStateManager stateManager)
         {

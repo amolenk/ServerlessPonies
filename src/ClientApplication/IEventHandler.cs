@@ -10,11 +10,6 @@ namespace ClientApplication
 {
     public interface IEventHandler<T>
     {
-        void Handle(T @event);
-    }
-
-    public interface IEventHandler2<T>
-    {
         void Handle(T @event, IStateManager stateManager);
     }
 }

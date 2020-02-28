@@ -3,7 +3,7 @@ using ClientApplication;
 
 namespace Amolenk.ServerlessPonies.ClientApplication.Handlers
 {
-    public class PlayerEventHandler : IEventHandler2<CreditsChangedEvent>
+    public class PlayerEventHandler : IEventHandler<CreditsChangedEvent>
     {
         public void Handle(CreditsChangedEvent @event, IStateManager stateManager)
         {

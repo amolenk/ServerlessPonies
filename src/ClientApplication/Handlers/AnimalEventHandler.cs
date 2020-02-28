@@ -10,10 +10,10 @@ using System.Threading.Tasks;
 
 namespace Amolenk.ServerlessPonies.ClientApplication.Handlers
 {
-    public class AnimalEventHandler : IEventHandler2<AnimalMovedEvent>,
-        IEventHandler2<AnimalPurchasedEvent>,
-        IEventHandler2<AnimalPurchaseFailedEvent>,
-        IEventHandler2<AnimalMoodChangedEvent>
+    public class AnimalEventHandler : IEventHandler<AnimalMovedEvent>,
+        IEventHandler<AnimalPurchasedEvent>,
+        IEventHandler<AnimalPurchaseFailedEvent>,
+        IEventHandler<AnimalMoodChangedEvent>
     {
         public void Handle(AnimalMovedEvent @event, IStateManager stateManager)
         {

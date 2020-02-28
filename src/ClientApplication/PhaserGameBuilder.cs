@@ -34,7 +34,7 @@ namespace ClientApplication
             return this;
         }
 
-        public PhaserGameBuilder WithEventHandler<T>(IEventHandler2<T> handler)
+        public PhaserGameBuilder WithEventHandler<T>(IEventHandler<T> handler)
         {
             _handlers.Add(typeof(T), (@event, stateManager) => handler.Handle((T)@event, stateManager));
             return this;

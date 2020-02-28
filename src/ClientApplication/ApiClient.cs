@@ -21,16 +21,6 @@ namespace ClientApplication
             _client.BaseAddress = new Uri(configuration.GetValue<string>("FunctionsBaseUrl"));
         }
 
-        public Task JoinGame(string gameName, string playerName)
-        {
-            var command = new JoinGameCommand
-            {
-                PlayerName = playerName
-            };
-
-            return _client.SendJsonAsync(HttpMethod.Post, $"/api/game/{gameName}/join", command);
-        }
-
         public Task StartSinglePlayerGame(string gameName, string playerName)
         {
             var command = new StartSinglePlayerGameCommand
@@ -39,11 +29,6 @@ namespace ClientApplication
             };
 
             return _client.SendJsonAsync(HttpMethod.Post, $"/api/game/{gameName}/start", command);
-        }
-
-        public Task StartGame(string gameName)
-        {
-            return _client.PatchAsync($"/api/game/{gameName}/start", null);
         }
 
         public Task PurchaseAnimalAsync(string gameName, string animalName, string ownerName)

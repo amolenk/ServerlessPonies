@@ -10,7 +10,7 @@ namespace Amolenk.ServerlessPonies.FunctionApplication
     {
         public override void Configure(IFunctionsHostBuilder builder)
         {
-            builder.Services.AddHttpClient<IEventPublisher, HttpEventPublisher>();
+            // TODO Do we still need this?
             builder.Services.AddHttpClient();
         }
     }

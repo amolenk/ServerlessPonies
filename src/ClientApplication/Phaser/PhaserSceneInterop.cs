@@ -77,12 +77,6 @@ namespace Amolenk.ServerlessPonies.ClientApplication.Phaser
             return new PhaserTextInterop(_jsRuntime, _scene.GetName(), name);
         }
 
-        public IPhaserSceneInterop AddRectangle(double x, double y, double width, double height, string color)
-        {
-            _jsRuntime.InvokeVoid("addRectangle", _scene.GetName(), x, y, width, height, color);
-            return this;
-        }
-
         public IPhaserSceneInterop OnPointerMove(string handlerName)
         {
             _jsRuntime.InvokeVoid("addSceneEventHandler", _scene.GetName(), "pointermove", handlerName);

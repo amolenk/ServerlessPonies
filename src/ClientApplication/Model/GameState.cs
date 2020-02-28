@@ -1,9 +1,5 @@
-using Microsoft.JSInterop;
 using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Amolenk.ServerlessPonies.ClientApplication.Model
 {
@@ -35,16 +31,5 @@ namespace Amolenk.ServerlessPonies.ClientApplication.Model
 
         public Animal FindAnimal(string name)
             => Animals.Find(animal => animal.Name == name);
-
-        // public void UpdateAnimalState(string name, Action<Animal> update)
-        // {
-        //     var animal = Animals.Find(animal => animal.Name == name);
-        //     if (animal != null)
-        //     {
-        //         update(animal);
-        //     }
-
-        //     AnimalStateChanged?.Invoke(this, animal);
-        // }
     }
 }

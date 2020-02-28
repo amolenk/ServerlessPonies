@@ -85,7 +85,6 @@ function addSprite(sceneName, spriteName, imageName, x, y, scale = null, interac
     const sprite = sceneInfo.phaserScene.add.sprite(x, y, 'sprites');
     sprite.name = spriteName; // TODO Use same strategy for scenes.
     sprite.setFrame(imageName);
-
     if (scale) {
         sprite.setScale(scale);
     }

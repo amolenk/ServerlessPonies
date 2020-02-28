@@ -32,7 +32,7 @@
                 options.Transports = HttpTransportType.LongPolling;
             })
             .Build();
-
+        
         _hubConnection.On<string, JsonElement>("HandleMessage", HandleMessage);
 
         await _hubConnection.StartAsync();

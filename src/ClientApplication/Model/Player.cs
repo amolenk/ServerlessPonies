@@ -1,4 +1,3 @@
-using Amolenk.ServerlessPonies.ClientApplication.Model;
 using System;
 
 namespace Amolenk.ServerlessPonies.ClientApplication.Model

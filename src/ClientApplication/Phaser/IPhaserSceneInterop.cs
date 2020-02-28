@@ -1,11 +1,4 @@
-using Amolenk.ServerlessPonies.ClientApplication.Scenes;
-using Microsoft.JSInterop;
 using System;
-using System.Collections.Generic;
-//using System.Drawing;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Amolenk.ServerlessPonies.ClientApplication.Phaser
 {
@@ -26,8 +19,6 @@ namespace Amolenk.ServerlessPonies.ClientApplication.Phaser
         IPhaserSpriteInterop Sprite(string name);
 
         IPhaserTextInterop Text(string name);
-
-        IPhaserSceneInterop AddRectangle(double x, double y, double width, double height, string color = "black");
 
         // TODO Create Sync/Async versions
 

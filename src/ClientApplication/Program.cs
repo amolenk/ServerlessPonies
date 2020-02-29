@@ -28,7 +28,7 @@ namespace ClientApplication
             builder.Configuration.AddInMemoryCollection(new Dictionary<string, string>
             {
                 { "FunctionsBaseUrl", "https://serverlessponies.azurewebsites.net/" }
-               //{ "FunctionsBaseUrl", "http://localhost:7071/" }
+                //{ "FunctionsBaseUrl", "http://localhost:7071/" }
             });
 
             builder.RootComponents.Add<App>("app");

@@ -16,14 +16,17 @@ function findText(sceneName, textName) {
     });
 }
 
-function addSpriteEventHandler(sceneName, spriteName, eventName, handlerName) {
+function addSpriteEventHandler(sceneName, spriteName, eventName, handlerName, async) {
     const sprite = findSprite(sceneName, spriteName);
     sprite.setInteractive({ pixelPerfect: true });
     sprite.on(eventName, (pointer) => {
         const sceneInfo = sceneInfos[sceneName];
         const eventArgs = { 'spriteName': spriteName, 'spriteX': sprite.x, 'spriteY': sprite.y, 'x': pointer.x, 'y': pointer.y, 'distance': -1 };
         if (pointer.distance) eventArgs.distance = pointer.distance;
-        sceneInfo.dotNetScene.invokeMethodAsync(handlerName, eventArgs);
+        if (async)
+            sceneInfo.dotNetScene.invokeMethodAsync(handlerName, eventArgs);
+        else
+            sceneInfo.dotNetScene.invokeMethod(handlerName, eventArgs);
     });
 }
 
@@ -169,16 +172,6 @@ function removeSprite(sceneName, spriteName) {
     if (sprite) {
         sprite.destroy();
     }
-}
-
-function addRectangle(sceneName, x, y, width, height, color) {
-
-    const sceneInfo = sceneInfos[sceneName];
-    var graphics = sceneInfo.phaserScene.add.graphics({ fillStyle: { color: color } });
-
-    var rect = new Phaser.Geom.Rectangle(x, y, width, height);
-
-    graphics.fillRectShape(rect);
 }
 
 // TODO Rename to active

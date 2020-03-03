@@ -1,17 +1,15 @@
 ﻿@page "/game/{PlayerName}"
-@using Microsoft.AspNetCore.Http.Connections
-@using Microsoft.AspNetCore.SignalR.Client
 @using System.Text.Json
-@using Microsoft.Extensions.Configuration
-@using Amolenk.ServerlessPonies.Messages;
 @using Amolenk.ServerlessPonies.ClientApplication.Handlers
 @using Amolenk.ServerlessPonies.ClientApplication.Phaser
 @using Amolenk.ServerlessPonies.ClientApplication.Scenes
-@inject IJSRuntime JSRuntime;
-@inject HttpClient HttpClient;
+@using Amolenk.ServerlessPonies.Messages;
+@using Microsoft.AspNetCore.Http.Connections
+@using Microsoft.AspNetCore.SignalR.Client
+@using Microsoft.Extensions.Configuration
 @inject IConfiguration Configuration
-@inject IServiceProvider ServiceProvider;
 @inject IPhaserInterop Phaser;
+@inject IServiceProvider ServiceProvider;
 
 <div id="phaser-container"></div>
 
@@ -28,7 +26,9 @@
         _hubConnection = new HubConnectionBuilder()
             .WithUrl($"{Configuration.GetValue<string>("FunctionsBaseUrl")}api/signalr/{PlayerName}", options =>
             {
-                // TODO Add reason
+                // HACK Current Blazor SignalR implementation does not support access tokens
+                // with web sockets.
+                // See: https://github.com/dotnet/aspnetcore/issues/18697 
                 options.Transports = HttpTransportType.LongPolling;
             })
             .Build();
@@ -47,7 +47,6 @@
             .WithScene<AnimalCareScene>()
             .WithScene<AnimalManagementScene>()
             .WithScene<CreditsScene>()
-            .WithScene<SpinnerScene>()
             .WithEventHandler<GameStartedEvent>(new GameStartedEventHandler())
             .WithEventHandler<AnimalMoodChangedEvent>(animalEventHandler)
             .WithEventHandler<AnimalMovedEvent>(animalEventHandler)
@@ -61,7 +60,6 @@
 
     void HandleMessage(string eventName, JsonElement eventPayload)
     {
-        // TODO Use logger
         Console.WriteLine($"Received '{eventName}' event: {eventPayload}");
 
         var eventTypeName = $"Amolenk.ServerlessPonies.Messages.{eventName},Messages";

@@ -1,9 +1,9 @@
 using Amolenk.ServerlessPonies.ClientApplication.Model;
 using Amolenk.ServerlessPonies.ClientApplication.Phaser;
-using Amolenk.ServerlessPonies.Messages;
 using ClientApplication;
 using Microsoft.JSInterop;
 using System;
+using System.Threading.Tasks;
 
 namespace Amolenk.ServerlessPonies.ClientApplication.Scenes
 {
@@ -34,9 +34,9 @@ namespace Amolenk.ServerlessPonies.ClientApplication.Scenes
                 .AddSprite("btnBack", "misc/back", 165, 95, options => options
                     .OnPointerUp(nameof(btnBack_PointerUp)))
 
-                .AddSprite("sprAnimal", $"animals/{State.SelectedAnimal().Name}/side", 750, 750, options => options
-                    .OnPointerMove(nameof(Animal_PointerMove))
-                    .OnPointerUp(nameof(Animal_PointerUp)))
+                .AddSprite("sprAnimal", $"animals/{State.SelectedAnimal().Name}/side", 690, 640, options => options
+                    .OnPointerMoveAsync(nameof(Animal_PointerMove))
+                    .OnPointerUpAsync(nameof(Animal_PointerUp)))
 
                 .AddSprite("sprMoodBackground", "misc/mood-bg", 640, 940)
 
@@ -70,14 +70,14 @@ namespace Amolenk.ServerlessPonies.ClientApplication.Scenes
         }
 
         [JSInvokable]
-        public void Animal_PointerMove(SpritePointerEventArgs e)
+        public async Task Animal_PointerMove(SpritePointerEventArgs e)
         {
             if (_activitySprite == "sprClean")
             {
                 _cleaningPoints += e.Distance;
                 if (_cleaningPoints >= 10000)
                 {
-                    _apiClient.CleanAnimal(
+                    await _apiClient.CleanAnimalAsync(
                         StateManager.State.GameName,
                         StateManager.PlayerName,
                         StateManager.State.SelectedAnimalName);
@@ -88,18 +88,18 @@ namespace Amolenk.ServerlessPonies.ClientApplication.Scenes
         }
 
         [JSInvokable]
-        public void Animal_PointerUp(SpritePointerEventArgs e)
+        public async Task Animal_PointerUp(SpritePointerEventArgs e)
         {
             if (_activitySprite == "sprFeed")
             {
-                _apiClient.FeedAnimal(
+                await _apiClient.FeedAnimalAsync(
                     StateManager.State.GameName,
                     StateManager.PlayerName,
                     StateManager.State.SelectedAnimalName);
             }
             else if (_activitySprite == "sprWater")
             {
-                _apiClient.WaterAnimal(
+                await _apiClient.WaterAnimalAsync(
                     StateManager.State.GameName,
                     StateManager.PlayerName,
                     StateManager.State.SelectedAnimalName);
@@ -150,8 +150,7 @@ namespace Amolenk.ServerlessPonies.ClientApplication.Scenes
             _activitySprite = null;
         }
 
-        // TODO Rename to WireStateHandlers?
-        protected override void StateChanged(GameState state)
+        protected override void WireStateHandlers(GameState state)
         {
             foreach (var animal in state.Animals)
             {

@@ -22,8 +22,14 @@ namespace Amolenk.ServerlessPonies.ClientApplication.Phaser
 
         IPhaserSpriteInterop OnPointerUp(string handlerName);
 
+        IPhaserSpriteInterop OnPointerUpAsync(string handlerName);
+
         IPhaserSpriteInterop OnPointerDown(string handlerName);
 
+        IPhaserSpriteInterop OnPointerDownAsync(string handlerName);
+
         IPhaserSpriteInterop OnPointerMove(string handlerName);
+
+        IPhaserSpriteInterop OnPointerMoveAsync(string handlerName);
     }
 }

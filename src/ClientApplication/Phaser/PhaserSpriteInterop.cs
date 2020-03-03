@@ -52,19 +52,37 @@ namespace Amolenk.ServerlessPonies.ClientApplication.Phaser
 
         public IPhaserSpriteInterop OnPointerUp(string handlerName)
         {
-            _jsRuntime.InvokeVoid("addSpriteEventHandler", _sceneName, _spriteName, "pointerup", handlerName);
+            _jsRuntime.InvokeVoid("addSpriteEventHandler", _sceneName, _spriteName, "pointerup", handlerName, false);
+            return this;
+        }
+
+        public IPhaserSpriteInterop OnPointerUpAsync(string handlerName)
+        {
+            _jsRuntime.InvokeVoid("addSpriteEventHandler", _sceneName, _spriteName, "pointerup", handlerName, true);
             return this;
         }
 
         public IPhaserSpriteInterop OnPointerDown(string handlerName)
         {
-            _jsRuntime.InvokeVoid("addSpriteEventHandler", _sceneName, _spriteName, "pointerdown", handlerName);
+            _jsRuntime.InvokeVoid("addSpriteEventHandler", _sceneName, _spriteName, "pointerdown", handlerName, false);
+            return this;
+        }
+
+        public IPhaserSpriteInterop OnPointerDownAsync(string handlerName)
+        {
+            _jsRuntime.InvokeVoid("addSpriteEventHandler", _sceneName, _spriteName, "pointerdown", handlerName, true);
             return this;
         }
 
         public IPhaserSpriteInterop OnPointerMove(string handlerName)
         {
-            _jsRuntime.InvokeVoid("addSpriteEventHandler", _sceneName, _spriteName, "pointermove", handlerName);
+            _jsRuntime.InvokeVoid("addSpriteEventHandler", _sceneName, _spriteName, "pointermove", handlerName, false);
+            return this;
+        }
+
+        public IPhaserSpriteInterop OnPointerMoveAsync(string handlerName)
+        {
+            _jsRuntime.InvokeVoid("addSpriteEventHandler", _sceneName, _spriteName, "pointermove", handlerName, true);
             return this;
         }
     }

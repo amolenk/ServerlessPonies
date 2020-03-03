@@ -23,10 +23,10 @@ namespace Amolenk.ServerlessPonies.ClientApplication.Scenes
         {
             Phaser(interop => interop.AddSprite("sprLogo", "misc/logo", 640, 512));
 
-            _apiClient.StartSinglePlayerGame(Guid.NewGuid().ToString("N"), StateManager.PlayerName);
+            _apiClient.StartSinglePlayerGameAsync(Guid.NewGuid().ToString("N"), StateManager.PlayerName);
         }
 
-        protected override void StateChanged(GameState state)
+        protected override void WireStateHandlers(GameState state)
         {
             // TODO Double check GameName as well?
             if (StateManager.State.IsStarted)

@@ -4,8 +4,8 @@
 			"frame": {
 				"h": 109,
 				"w": 95,
-				"x": 1187,
-				"y": 2056
+				"x": 904,
+				"y": 2824
 			},
 			"rotated": false,
 			"spriteSourceSize": {
@@ -24,8 +24,8 @@
 			"frame": {
 				"h": 133,
 				"w": 163,
-				"x": 1695,
-				"y": 2084
+				"x": 4,
+				"y": 2824
 			},
 			"rotated": false,
 			"spriteSourceSize": {
@@ -44,8 +44,8 @@
 			"frame": {
 				"h": 103,
 				"w": 92,
-				"x": 4,
-				"y": 2238
+				"x": 2486,
+				"y": 1633
 			},
 			"rotated": false,
 			"spriteSourceSize": {
@@ -64,8 +64,8 @@
 			"frame": {
 				"h": 134,
 				"w": 106,
-				"x": 2357,
-				"y": 2084
+				"x": 691,
+				"y": 2824
 			},
 			"rotated": false,
 			"spriteSourceSize": {
@@ -84,8 +84,8 @@
 			"frame": {
 				"h": 113,
 				"w": 103,
-				"x": 1695,
-				"y": 2219
+				"x": 799,
+				"y": 2824
 			},
 			"rotated": false,
 			"spriteSourceSize": {
@@ -104,8 +104,8 @@
 			"frame": {
 				"h": 140,
 				"w": 130,
-				"x": 1965,
-				"y": 2084
+				"x": 169,
+				"y": 2824
 			},
 			"rotated": false,
 			"spriteSourceSize": {
@@ -122,50 +122,10 @@
 		},
 		"animals/amigo/photo": {
 			"frame": {
-				"h": 239,
-				"w": 198,
-				"x": 1495,
-				"y": 2084
-			},
-			"rotated": false,
-			"spriteSourceSize": {
-				"h": 239,
-				"w": 198,
-				"x": 0,
-				"y": 0
-			},
-			"sourceSize": {
-				"h": 239,
-				"w": 198
-			},
-			"trimmed": false
-		},
-		"animals/amigo/top": {
-			"frame": {
-				"h": 199,
-				"w": 103,
-				"x": 1860,
-				"y": 2084
-			},
-			"rotated": false,
-			"spriteSourceSize": {
-				"h": 199,
-				"w": 103,
-				"x": 0,
-				"y": 0
-			},
-			"sourceSize": {
-				"h": 199,
-				"w": 103
-			},
-			"trimmed": false
-		},
-		"animals/wally/photo": {
-			"frame": {
 				"h": 248,
 				"w": 207,
-				"x": 1286,
-				"y": 2084
+				"x": 2121,
+				"y": 2566
 			},
 			"rotated": false,
 			"spriteSourceSize": {
@@ -180,32 +140,152 @@
 			},
 			"trimmed": false
 		},
-		"animals/wally/side": {
+		"animals/amigo/side": {
 			"frame": {
-				"h": 1052,
-				"w": 1214,
+				"h": 766,
+				"w": 1198,
+				"x": 1286,
+				"y": 1798
+			},
+			"rotated": false,
+			"spriteSourceSize": {
+				"h": 766,
+				"w": 1198,
+				"x": 0,
+				"y": 0
+			},
+			"sourceSize": {
+				"h": 766,
+				"w": 1198
+			},
+			"trimmed": false
+		},
+		"animals/amigo/top": {
+			"frame": {
+				"h": 199,
+				"w": 103,
+				"x": 2486,
+				"y": 1432
+			},
+			"rotated": false,
+			"spriteSourceSize": {
+				"h": 199,
+				"w": 103,
+				"x": 0,
+				"y": 0
+			},
+			"sourceSize": {
+				"h": 199,
+				"w": 103
+			},
+			"trimmed": false
+		},
+		"animals/boy/photo": {
+			"frame": {
+				"h": 239,
+				"w": 198,
+				"x": 2330,
+				"y": 2566
+			},
+			"rotated": false,
+			"spriteSourceSize": {
+				"h": 239,
+				"w": 198,
+				"x": 0,
+				"y": 0
+			},
+			"sourceSize": {
+				"h": 239,
+				"w": 198
+			},
+			"trimmed": false
+		},
+		"animals/boy/side": {
+			"frame": {
+				"h": 766,
+				"w": 1198,
 				"x": 1286,
 				"y": 1030
 			},
 			"rotated": false,
 			"spriteSourceSize": {
-				"h": 1052,
-				"w": 1214,
+				"h": 766,
+				"w": 1198,
 				"x": 0,
 				"y": 0
 			},
 			"sourceSize": {
-				"h": 1052,
-				"w": 1214
+				"h": 766,
+				"w": 1198
 			},
 			"trimmed": false
 		},
-		"animals/wally/top": {
+		"animals/boy/top": {
 			"frame": {
 				"h": 199,
 				"w": 103,
-				"x": 1860,
-				"y": 2084
+				"x": 2486,
+				"y": 1030
+			},
+			"rotated": false,
+			"spriteSourceSize": {
+				"h": 199,
+				"w": 103,
+				"x": 0,
+				"y": 0
+			},
+			"sourceSize": {
+				"h": 199,
+				"w": 103
+			},
+			"trimmed": false
+		},
+		"animals/spot/photo": {
+			"frame": {
+				"h": 239,
+				"w": 198,
+				"x": 1634,
+				"y": 2748
+			},
+			"rotated": false,
+			"spriteSourceSize": {
+				"h": 239,
+				"w": 198,
+				"x": 0,
+				"y": 0
+			},
+			"sourceSize": {
+				"h": 239,
+				"w": 198
+			},
+			"trimmed": false
+		},
+		"animals/spot/side": {
+			"frame": {
+				"h": 766,
+				"w": 1198,
+				"x": 4,
+				"y": 2056
+			},
+			"rotated": false,
+			"spriteSourceSize": {
+				"h": 766,
+				"w": 1198,
+				"x": 0,
+				"y": 0
+			},
+			"sourceSize": {
+				"h": 766,
+				"w": 1198
+			},
+			"trimmed": false
+		},
+		"animals/spot/top": {
+			"frame": {
+				"h": 199,
+				"w": 103,
+				"x": 2486,
+				"y": 1231
 			},
 			"rotated": false,
 			"spriteSourceSize": {
@@ -225,7 +305,7 @@
 				"h": 1024,
 				"w": 1280,
 				"x": 4,
-				"y": 4
+				"y": 1030
 			},
 			"rotated": false,
 			"spriteSourceSize": {
@@ -245,7 +325,7 @@
 				"h": 1024,
 				"w": 1280,
 				"x": 4,
-				"y": 1030
+				"y": 4
 			},
 			"rotated": false,
 			"spriteSourceSize": {
@@ -284,8 +364,8 @@
 			"frame": {
 				"h": 46,
 				"w": 60,
-				"x": 166,
-				"y": 2238
+				"x": 1204,
+				"y": 2127
 			},
 			"rotated": false,
 			"spriteSourceSize": {
@@ -304,8 +384,8 @@
 			"frame": {
 				"h": 200,
 				"w": 346,
-				"x": 596,
-				"y": 2056
+				"x": 1286,
+				"y": 2748
 			},
 			"rotated": false,
 			"spriteSourceSize": {
@@ -324,8 +404,8 @@
 			"frame": {
 				"h": 43,
 				"w": 45,
-				"x": 228,
-				"y": 2238
+				"x": 1204,
+				"y": 2175
 			},
 			"rotated": false,
 			"spriteSourceSize": {
@@ -344,8 +424,8 @@
 			"frame": {
 				"h": 69,
 				"w": 66,
-				"x": 98,
-				"y": 2238
+				"x": 1204,
+				"y": 2056
 			},
 			"rotated": false,
 			"spriteSourceSize": {
@@ -364,8 +444,8 @@
 			"frame": {
 				"h": 241,
 				"w": 241,
-				"x": 944,
-				"y": 2056
+				"x": 1878,
+				"y": 2566
 			},
 			"rotated": false,
 			"spriteSourceSize": {
@@ -384,8 +464,8 @@
 			"frame": {
 				"h": 180,
 				"w": 590,
-				"x": 4,
-				"y": 2056
+				"x": 1286,
+				"y": 2566
 			},
 			"rotated": false,
 			"spriteSourceSize": {
@@ -404,8 +484,8 @@
 			"frame": {
 				"h": 13,
 				"w": 100,
-				"x": 275,
-				"y": 2238
+				"x": 4,
+				"y": 2959
 			},
 			"rotated": false,
 			"spriteSourceSize": {
@@ -424,8 +504,8 @@
 			"frame": {
 				"h": 11,
 				"w": 98,
-				"x": 377,
-				"y": 2238
+				"x": 301,
+				"y": 2954
 			},
 			"rotated": false,
 			"spriteSourceSize": {
@@ -444,8 +524,8 @@
 			"frame": {
 				"h": 128,
 				"w": 128,
-				"x": 2097,
-				"y": 2214
+				"x": 561,
+				"y": 2824
 			},
 			"rotated": false,
 			"spriteSourceSize": {
@@ -464,8 +544,8 @@
 			"frame": {
 				"h": 128,
 				"w": 128,
-				"x": 2227,
-				"y": 2084
+				"x": 431,
+				"y": 2824
 			},
 			"rotated": false,
 			"spriteSourceSize": {
@@ -484,8 +564,8 @@
 			"frame": {
 				"h": 128,
 				"w": 128,
-				"x": 2097,
-				"y": 2084
+				"x": 301,
+				"y": 2824
 			},
 			"rotated": false,
 			"spriteSourceSize": {

@@ -1,13 +1,7 @@
 using Amolenk.ServerlessPonies.ClientApplication.Model;
-using Amolenk.ServerlessPonies.ClientApplication.Scenes;
 using Amolenk.ServerlessPonies.Messages;
 using ClientApplication;
-using Microsoft.JSInterop;
-using System;
-using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Amolenk.ServerlessPonies.ClientApplication.Handlers
 {

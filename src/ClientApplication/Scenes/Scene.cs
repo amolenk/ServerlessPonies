@@ -26,19 +26,13 @@ namespace Amolenk.ServerlessPonies.ClientApplication.Scenes
             _phaser = phaser;
             _stateManager = stateManager;
 
-            OnInitialized();
-        }
-
-        // Actual scenes may not need this anymore
-        protected virtual void OnInitialized()
-        {
             StateManager.GameStateChanged += (sender, args) =>
             {
-                StateChanged(StateManager.State);
+                WireStateHandlers(StateManager.State);
             };
         }
 
-        protected virtual void StateChanged(GameState state)
+        protected virtual void WireStateHandlers(GameState state)
         {
         }
 

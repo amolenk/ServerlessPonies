@@ -22,8 +22,7 @@ namespace ClientApplication
                 .AddTransient<CreditsScene>()
                 .AddTransient<RanchScene>()
                 .AddTransient<AnimalManagementScene>()
-                .AddTransient<AnimalCareScene>()
-                .AddTransient<SpinnerScene>();
+                .AddTransient<AnimalCareScene>();
 
             builder.Configuration.AddInMemoryCollection(new Dictionary<string, string>
             {

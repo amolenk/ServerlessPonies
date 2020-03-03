@@ -1,13 +1,10 @@
 using Amolenk.ServerlessPonies.ClientApplication.Model;
 using Amolenk.ServerlessPonies.ClientApplication.Phaser;
-using Amolenk.ServerlessPonies.Messages;
 using ClientApplication;
 using Microsoft.JSInterop;
-using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
+using System.Drawing;
 using System.Threading.Tasks;
 
 namespace Amolenk.ServerlessPonies.ClientApplication.Scenes
@@ -15,6 +12,20 @@ namespace Amolenk.ServerlessPonies.ClientApplication.Scenes
     public class RanchScene : Scene
     {
         public const string Name = "Ranch";
+
+        private static readonly List<Point[]> EnclosureHitboxes = new List<Point[]>
+        {
+            new Point[] { new Point(80, 110), new Point(265, 20), new Point(395, 275), new Point(218, 365) },
+            new Point[] { new Point(405, 0), new Point(612, 0), new Point(623, 280), new Point(422, 290) },
+            new Point[] { new Point(738, 70), new Point(953, 190), new Point(813, 392), new Point(640, 281) }
+        };
+
+        private static readonly Dictionary<string, Point> AnimalPositions = new Dictionary<string, Point>
+        {
+            { "1", new Point(250, 195) },
+            { "2", new Point(500, 160) },
+            { "3", new Point(792, 235) }
+        };
 
         public override string GetName() => Name;
 
@@ -24,11 +35,8 @@ namespace Amolenk.ServerlessPonies.ClientApplication.Scenes
             Phaser(interop =>
             {
                 interop
-                    .AddSprite(SpriteName.Create("btnEnclosure", "1"), "backgrounds/ranch", 640, 512)
-                        .OnPointerUp(nameof(btnEnclosure_PointerUp));
-                    // .AddSprite("button", "brush", 100, 125, options => options
-                    //     .Scale(0.2)                    
-                    //     .OnPointerUp(nameof(Button_PointerUp)));
+                    .AddSprite("sprBackground", "backgrounds/ranch", 640, 512)
+                        .OnPointerUp(nameof(sprBackground_PointerUp));
 
                 foreach (var animal in State.Animals)
                 {
@@ -41,35 +49,27 @@ namespace Amolenk.ServerlessPonies.ClientApplication.Scenes
             });
         }
 
-        [JSInvokable] // TODO Sync/async
-        public Task Button_PointerUp(SpritePointerEventArgs e)
+        [JSInvokable]
+        public void sprBackground_PointerUp(SpritePointerEventArgs e)
         {
-            State.SelectedEnclosureName = "1";
+            if (TryGetEnclosureAtPosition((int)e.X, (int)e.Y, out string clickedEnclosureName))
+            {
+                Console.WriteLine(clickedEnclosureName);
 
-            Phaser(interop => interop.SwitchToScene(AnimalManagementScene.Name));
-
-            return Task.CompletedTask;
-        }
-
-        [JSInvokable] // TODO Sync/async
-        public void btnEnclosure_PointerUp(SpritePointerEventArgs e)
-        {
-            State.SelectedEnclosureName = "1"; //SpriteName.ExtractId(e.SpriteName);
-
-            Phaser(interop => interop.SwitchToScene(AnimalManagementScene.Name));
+                State.SelectedEnclosureName = clickedEnclosureName;
+                Phaser(interop => interop.SwitchToScene(AnimalManagementScene.Name));
+            }
         }
 
         [JSInvokable]
-        public Task Animal_PointerUp(SpritePointerEventArgs e)
+        public void Animal_PointerUp(SpritePointerEventArgs e)
         {
             State.SelectedAnimalName = SpriteName.ExtractId(e.SpriteName);
 
             Phaser(interop => interop.SwitchToScene(AnimalCareScene.Name));
-
-            return Task.CompletedTask;
         }
 
-        protected override void StateChanged(GameState state)
+        protected override void WireStateHandlers(GameState state)
         {
             foreach (var animal in state.Animals)
             {
@@ -81,19 +81,97 @@ namespace Amolenk.ServerlessPonies.ClientApplication.Scenes
         {
             var animal = (Animal)sender;
 
-            AddAnimalSprite(animal);
+            Phaser(interop =>
+            {
+                var animalSpriteName = SpriteName.Create("animal", animal.Name);
+                var animalPosition = AnimalPositions[animal.EnclosureName];
+                var animalSprite = interop.Sprite(animalSpriteName);
+                
+                if (animalSprite.Exists())
+                {
+                    animalSprite.Move(animalPosition.X, animalPosition.Y);
+
+                    // // TODO Move RemoveSprite to sprite?
+                    // interop.RemoveSprite(animalSpriteName);
+                }
+                else
+                {
+                    interop.AddSprite(animalSpriteName, $"animals/{animal.Name}/top",
+                        animalPosition.X, animalPosition.Y, options => options
+                            .OnPointerUp(nameof(Animal_PointerUp)));
+                }
+            });
+
+//            AddAnimalSprite(animal);
         }
 
         private void AddAnimalSprite(Animal animal)
         {
             Phaser(interop =>
             {
-                 var animalSpriteName = SpriteName.Create("animal", animal.Name);
+                var animalSpriteName = SpriteName.Create("animal", animal.Name);
+                var animalPosition = AnimalPositions[animal.EnclosureName];
 
                 interop
-                    .AddSprite(animalSpriteName, $"animals/{animal.Name}/top", 500, 160, options => options
-                        .OnPointerUp(nameof(Animal_PointerUp)));
+                    .AddSprite(animalSpriteName, $"animals/{animal.Name}/top",
+                        animalPosition.X, animalPosition.Y, options => options
+                            .OnPointerUp(nameof(Animal_PointerUp)));
             });
+        }
+
+        private bool TryGetEnclosureAtPosition(int x, int y, out string enclosureName)
+        {
+            for (var i = 0; i < EnclosureHitboxes.Count; i++)
+            {
+                if (IsInPolygon(EnclosureHitboxes[i], new Point(x, y)))
+                {
+                    enclosureName = (i + 1).ToString();
+                    return true;
+                }
+            }
+            enclosureName = string.Empty;
+            return false;
+        }
+
+        private static bool IsInPolygon(Point[] poly, Point p)
+        {
+            Point p1, p2;
+            bool inside = false;
+
+            if (poly.Length < 3)
+            {
+                return inside;
+            }
+
+            var oldPoint = new Point(
+                poly[poly.Length - 1].X, poly[poly.Length - 1].Y);
+
+            for (int i = 0; i < poly.Length; i++)
+            {
+                var newPoint = new Point(poly[i].X, poly[i].Y);
+
+                if (newPoint.X > oldPoint.X)
+                {
+                    p1 = oldPoint;
+                    p2 = newPoint;
+                }
+                else
+                {
+                    p1 = newPoint;
+                    p2 = oldPoint;
+                }
+
+                if ((newPoint.X < p.X) == (p.X <= oldPoint.X)
+                    && (p.Y - (long) p1.Y)*(p2.X - p1.X)
+                    < (p2.Y - (long) p1.Y)*(p.X - p1.X))
+                {
+                    inside = !inside;
+                }
+
+                oldPoint = newPoint;
+            }
+
+            return inside;
         }
     }
 }

@@ -21,7 +21,7 @@ namespace ClientApplication
             _client.BaseAddress = new Uri(configuration.GetValue<string>("FunctionsBaseUrl"));
         }
 
-        public Task StartSinglePlayerGame(string gameName, string playerName)
+        public Task StartSinglePlayerGameAsync(string gameName, string playerName)
         {
             var command = new StartSinglePlayerGameCommand
             {
@@ -42,7 +42,7 @@ namespace ClientApplication
             return _client.SendJsonAsync(HttpMethod.Post, $"/api/game/{gameName}/purchase-animal", command);
         }
 
-        public Task MoveAnimal(string gameName, string animalName, string enclosureName)
+        public Task MoveAnimalAsync(string gameName, string animalName, string enclosureName)
         {
             var command = new MoveAnimalCommand
             {
@@ -53,7 +53,7 @@ namespace ClientApplication
             return _client.SendJsonAsync(HttpMethod.Post, $"/api/game/{gameName}/move-animal", command);
         }
 
-        public Task FeedAnimal(string gameName, string playerName, string animalName)
+        public Task FeedAnimalAsync(string gameName, string playerName, string animalName)
         {
             var command = new FeedAnimalCommand
             {
@@ -64,7 +64,7 @@ namespace ClientApplication
             return _client.SendJsonAsync(HttpMethod.Post, $"/api/game/{gameName}/feed-animal", command);
         }
 
-        public Task WaterAnimal(string gameName, string playerName, string animalName)
+        public Task WaterAnimalAsync(string gameName, string playerName, string animalName)
         {
             var command = new WaterAnimalCommand
             {
@@ -75,7 +75,7 @@ namespace ClientApplication
             return _client.SendJsonAsync(HttpMethod.Post, $"/api/game/{gameName}/water-animal", command);
         }
 
-        public Task CleanAnimal(string gameName, string playerName, string animalName)
+        public Task CleanAnimalAsync(string gameName, string playerName, string animalName)
         {
             var command = new CleanAnimalCommand
             {

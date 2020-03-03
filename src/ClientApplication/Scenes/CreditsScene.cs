@@ -21,7 +21,7 @@ namespace Amolenk.ServerlessPonies.ClientApplication.Scenes
                 .AddText("txtCredits", 1055, 95, player.Credits.ToString(), 36, "black"/*Color.FromArgb(237, 227, 211)*/, "bold"));
         }
 
-        protected override void StateChanged(GameState state)
+        protected override void WireStateHandlers(GameState state)
         {
             var player = StateManager.State.FindPlayer(StateManager.PlayerName);
             player.CreditsChanged += (sender, args) =>

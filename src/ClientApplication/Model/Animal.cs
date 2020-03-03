@@ -89,8 +89,6 @@ namespace Amolenk.ServerlessPonies.ClientApplication.Model
 
         public void NotifyPurchaseFailed()
         {
-            Console.WriteLine("NotifyPurchaseFailed");
-
             PurchaseFailed?.Invoke(this, EventArgs.Empty);
         }
     }

@@ -38,7 +38,7 @@ namespace Amolenk.ServerlessPonies.ClientApplication.Scenes
 
                     interop.AddSprite(SpriteName.Create("btnAnimalPhoto", animal.Name), $"animals/{animal.Name}/photo",
                         xPosition + 50, 350, options => options
-                            .OnPointerUp(nameof(btnAnimalPhoto_PointerUp)));
+                            .OnPointerUpAsync(nameof(btnAnimalPhoto_PointerUp)));
 
                     if (animal.OwnerName != StateManager.PlayerName)
                     {
@@ -77,7 +77,7 @@ namespace Amolenk.ServerlessPonies.ClientApplication.Scenes
             }
             else if (animal.OwnerName == StateManager.PlayerName)
             {
-                await _apiClient.MoveAnimal(State.GameName, animalName, State.SelectedEnclosureName);
+                await _apiClient.MoveAnimalAsync(State.GameName, animalName, State.SelectedEnclosureName);
 
                 Phaser(interop => interop.SwitchToScene(RanchScene.Name));
             }
@@ -87,7 +87,7 @@ namespace Amolenk.ServerlessPonies.ClientApplication.Scenes
             }
         }
 
-        protected override void StateChanged(GameState state)
+        protected override void WireStateHandlers(GameState state)
         {
             foreach (var animal in state.Animals)
             {

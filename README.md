@@ -23,4 +23,7 @@ When the folder has reopened in the development container, open a new Terminal w
 
 ## Deploy the back-end to Azure Functions
 
-Once the deployment script has completed, right-click the *FunctionApplication* folder and select 
+Once the deployment script has completed, right-click the *FunctionApplication* folder and select **Deploy to Function App**. VS Code will then ask you to select a subscription and a Function App. Select the *serverlessponiesxxxx* Function App that was created by the `deploy.sh` script.
+
+## Deploy the front-end to Azure Storage Static Website
+

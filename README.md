@@ -25,13 +25,13 @@ Click **Reopen in Container** to let VS Code create the container. This may take
 
 ### Name Azure resources
 
-When the folder has reopened in the development container, open the `src/deployment/deploy.azcli` file in the editor. The script contains a `uniqueSuffix` variable that you should change to some other random number to avoid any naming collisions with other deployed instances of the solution.
+When the folder has reopened in the development container, open the `deployment/deploy.azcli` file in the editor. The script contains a `uniqueSuffix` variable that you should change to some other random number to avoid any naming collisions with other deployed instances of the solution.
 
-Next, open up `src/ClientApplication/Program.cs` and change the value of the `ENVIRONMENT_SUFFIX` constant to the same number you choose in the deployment script.
+Next, open up `ClientApplication/Program.cs` and change the value of the `ENVIRONMENT_SUFFIX` constant to the same number you choose in the deployment script.
 
 ### Create Azure resources
 
-Open a new Terminal window in VS Code and navigate to the `src/deployment` folder.
+Open a new Terminal window in VS Code and navigate to the `/workspaces/ServerlessPonies/src/deployment` folder.
 
 Use `az login` to log in to your Azure subscription.
 

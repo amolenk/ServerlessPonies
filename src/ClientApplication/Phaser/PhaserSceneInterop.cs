@@ -2,7 +2,6 @@ using Amolenk.ServerlessPonies.ClientApplication.Scenes;
 using Microsoft.JSInterop;
 using System;
 using System.Collections.Generic;
-//using System.Drawing;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -37,9 +36,7 @@ namespace Amolenk.ServerlessPonies.ClientApplication.Phaser
 
         public IPhaserSceneInterop AddText(string name, double x, double y, string text, int fontSize, string color, string style)
         {
-            var fill = "black";//$"#{color.R:X2}{color.G:X2}{color.B:X2}";
-
-            _jsRuntime.InvokeVoid("addText", _scene.GetName(), name, x, y, text, $"{fontSize}px", fill, style);
+            _jsRuntime.InvokeVoid("addText", _scene.GetName(), name, x, y, text, $"{fontSize}px", "black", style);
             return this;
         }
 

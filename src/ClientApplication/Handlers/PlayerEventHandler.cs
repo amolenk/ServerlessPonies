@@ -1,5 +1,5 @@
+using Amolenk.ServerlessPonies.ClientApplication.Phaser;
 using Amolenk.ServerlessPonies.Messages;
-using ClientApplication;
 
 namespace Amolenk.ServerlessPonies.ClientApplication.Handlers
 {

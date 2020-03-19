@@ -28,7 +28,7 @@ namespace Amolenk.ServerlessPonies.ClientApplication.Scenes
 
         protected override void WireStateHandlers(GameState state)
         {
-            // TODO Double check GameName as well?
+            // FIX Double check GameName as well?
             if (StateManager.State.IsStarted)
             {
                 Phaser(interop => interop

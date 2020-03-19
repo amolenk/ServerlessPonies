@@ -1,12 +1,14 @@
 #!/bin/bash
 
+uniqueSuffix=9321
+
 resourceGroupName=ServerlessPoniesTestDeploy
 location=WestEurope
-storageAccountName=serverlessponies9321
+storageAccountName=serverlessponies$uniqueSuffix
 storageAccountKind=StorageV2
 storageAccountSku=Standard_LRS
-functionAppName=serverlessponies9321
-signalrServiceName=serverlessponies9321
+functionAppName=serverlessponies$uniqueSuffix
+signalrServiceName=serverlessponies$uniqueSuffix
 signalrServiceSku=Free_F1
 
 az group create -n $resourceGroupName -l $location

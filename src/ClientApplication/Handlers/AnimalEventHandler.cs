@@ -1,5 +1,5 @@
 using Amolenk.ServerlessPonies.Messages;
-using ClientApplication;
+using Amolenk.ServerlessPonies.ClientApplication.Phaser;
 using System;
 
 namespace Amolenk.ServerlessPonies.ClientApplication.Handlers
@@ -11,10 +11,25 @@ namespace Amolenk.ServerlessPonies.ClientApplication.Handlers
     {
         public void Handle(AnimalMovedEvent @event, IStateManager stateManager)
         {
-            var animal = stateManager.State.FindAnimal(@event.AnimalName);
-            if (animal != null)
+            var newOccupant = stateManager.State.FindAnimal(@event.AnimalName);
+            if (newOccupant != null)
             {
-                animal.EnclosureName = @event.EnclosureName;
+                var currentOccupant = stateManager.State.FindAnimalInEnclosure(@event.EnclosureName);
+                if (currentOccupant != null)
+                {
+                    if (currentOccupant == newOccupant)
+                    {
+                        // No change needed.
+                        return;
+                    }
+                    else
+                    {
+                        // Remove the current occupant of the enclosure.
+                        currentOccupant.EnclosureName = null;
+                    }
+                }
+
+                newOccupant.EnclosureName = @event.EnclosureName;
             }
         }
 

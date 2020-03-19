@@ -1,6 +1,5 @@
 using Amolenk.ServerlessPonies.ClientApplication.Model;
 using Microsoft.JSInterop;
-//using System.Drawing;
 
 namespace Amolenk.ServerlessPonies.ClientApplication.Scenes
 {

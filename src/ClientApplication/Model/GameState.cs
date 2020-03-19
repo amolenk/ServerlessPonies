@@ -16,8 +16,6 @@ namespace Amolenk.ServerlessPonies.ClientApplication.Model
         public List<Player> Players { get; set; }
 
         public List<Animal> Animals { get; set; }
-
-        public List<Enclosure> Enclosures { get; set; }
         
         public Animal SelectedAnimal()
             => Animals.Find(animal => animal.Name == SelectedAnimalName);
@@ -27,5 +25,8 @@ namespace Amolenk.ServerlessPonies.ClientApplication.Model
 
         public Animal FindAnimal(string name)
             => Animals.Find(animal => animal.Name == name);
+
+        public Animal FindAnimalInEnclosure(string enclosureName)
+            => Animals.Find(animal => animal.EnclosureName == enclosureName);
     }
 }

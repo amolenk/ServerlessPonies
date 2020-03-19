@@ -9,7 +9,7 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Components;
 using Microsoft.Extensions.Configuration;
 
-namespace ClientApplication
+namespace Amolenk.ServerlessPonies.ClientApplication
 {
     public class ApiClient
     {

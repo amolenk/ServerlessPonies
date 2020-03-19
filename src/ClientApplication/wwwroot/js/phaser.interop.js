@@ -86,7 +86,7 @@ function setSpriteData(sceneName, spriteName, key, value) {
 function addSprite(sceneName, spriteName, imageName, x, y, scale = null, interactive = false) {
     const sceneInfo = sceneInfos[sceneName];
     const sprite = sceneInfo.phaserScene.add.sprite(x, y, 'sprites');
-    sprite.name = spriteName; // TODO Use same strategy for scenes.
+    sprite.name = spriteName;
     sprite.setFrame(imageName);
     if (scale) {
         sprite.setScale(scale);
@@ -174,7 +174,6 @@ function removeSprite(sceneName, spriteName) {
     }
 }
 
-// TODO Rename to active
 function isSceneVisible(scene) {
     return game.scene.isActive(scene)
         || sceneInfos[scene].isCreating;

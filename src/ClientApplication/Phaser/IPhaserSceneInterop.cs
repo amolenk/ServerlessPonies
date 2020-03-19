@@ -20,8 +20,6 @@ namespace Amolenk.ServerlessPonies.ClientApplication.Phaser
 
         IPhaserTextInterop Text(string name);
 
-        // TODO Create Sync/Async versions
-
         IPhaserSceneInterop OnPointerMove(string handlerName);
 
         IPhaserSceneInterop OnPointerDown(string handlerName);

@@ -2,7 +2,7 @@
 using System;
 using Amolenk.ServerlessPonies.ClientApplication.Model;
 
-namespace ClientApplication
+namespace Amolenk.ServerlessPonies.ClientApplication
 {
     public interface IStateManager
     {

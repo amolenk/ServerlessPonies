@@ -31,16 +31,6 @@ namespace Amolenk.ServerlessPonies.FunctionApplication.Entities
         [JsonProperty]
         public AnimalStateCollection AnimalStates { get; set; }
 
-        public void Join(string playerName)
-        {
-            if (!IsStarted)
-            {
-                AddPlayer(playerName);
-            }
-
-            // TODO What else?
-        }
-
         public Task StartSinglePlayer(string playerName)
         {
             AddPlayer(playerName);

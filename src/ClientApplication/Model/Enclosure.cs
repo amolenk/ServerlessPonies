@@ -4,6 +4,6 @@ namespace Amolenk.ServerlessPonies.ClientApplication.Model
     {
         public string Id { get; set; }
 
-        public string AnimalId { get; set; }
+        public string AnimalName { get; set; }
     }
 }

@@ -23,7 +23,7 @@ namespace Amolenk.ServerlessPonies.ClientApplication.Scenes
         private static readonly Dictionary<string, Point> AnimalPositions = new Dictionary<string, Point>
         {
             { "1", new Point(250, 195) },
-            { "2", new Point(500, 160) },
+            { "2", new Point(500, 145) },
             { "3", new Point(792, 235) }
         };
 
@@ -54,8 +54,6 @@ namespace Amolenk.ServerlessPonies.ClientApplication.Scenes
         {
             if (TryGetEnclosureAtPosition((int)e.X, (int)e.Y, out string clickedEnclosureName))
             {
-                Console.WriteLine(clickedEnclosureName);
-
                 State.SelectedEnclosureName = clickedEnclosureName;
                 Phaser(interop => interop.SwitchToScene(AnimalManagementScene.Name));
             }
@@ -84,25 +82,31 @@ namespace Amolenk.ServerlessPonies.ClientApplication.Scenes
             Phaser(interop =>
             {
                 var animalSpriteName = SpriteName.Create("animal", animal.Name);
-                var animalPosition = AnimalPositions[animal.EnclosureName];
                 var animalSprite = interop.Sprite(animalSpriteName);
                 
-                if (animalSprite.Exists())
+                if (e.EnclosureName == null)
                 {
-                    animalSprite.Move(animalPosition.X, animalPosition.Y);
-
-                    // // TODO Move RemoveSprite to sprite?
-                    // interop.RemoveSprite(animalSpriteName);
+                    if (animalSprite.Exists())
+                    {
+                        interop.RemoveSprite(animalSpriteName);
+                    }
                 }
                 else
                 {
-                    interop.AddSprite(animalSpriteName, $"animals/{animal.Name}/top",
-                        animalPosition.X, animalPosition.Y, options => options
-                            .OnPointerUp(nameof(Animal_PointerUp)));
+                    var animalPosition = AnimalPositions[animal.EnclosureName];
+
+                    if (animalSprite.Exists())
+                    {
+                        animalSprite.Move(animalPosition.X, animalPosition.Y);
+                    }
+                    else
+                    {
+                        interop.AddSprite(animalSpriteName, $"animals/{animal.Name}/top",
+                            animalPosition.X, animalPosition.Y, options => options
+                                .OnPointerUp(nameof(Animal_PointerUp)));
+                    }
                 }
             });
-
-//            AddAnimalSprite(animal);
         }
 
         private void AddAnimalSprite(Animal animal)

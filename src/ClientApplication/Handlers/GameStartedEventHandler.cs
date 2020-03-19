@@ -1,6 +1,6 @@
 using Amolenk.ServerlessPonies.ClientApplication.Model;
+using Amolenk.ServerlessPonies.ClientApplication.Phaser;
 using Amolenk.ServerlessPonies.Messages;
-using ClientApplication;
 using System.Linq;
 
 namespace Amolenk.ServerlessPonies.ClientApplication.Handlers

@@ -1,8 +1,6 @@
 # Serverless Ponies 🐴
 
-This repo contains a work-in-progress game I'm building together with my 9 year-old daughter. It's a sample of how to create a serverless web application using Azure Functions on the server-side and Blazor WebAssembly on the client-side (hosted in an Azure Storage static website).
-
-
+This repo contains a work-in-progress game I'm building together with my 9 year-old daughter Lisa. It's a sample of how to create a serverless web application using Azure Functions on the server-side and Blazor WebAssembly on the client-side (hosted in an Azure Storage static website).
 
 ## Getting started
 
@@ -21,9 +19,15 @@ Open the `src` folder in VS Code. VS Code will ask you if you want to re-open th
 
 Click **Reopen in Container** to let VS Code create the container. This may take some time, and a progress notification will provide status updates.
 
+### Name Azure resources
+
+When the folder has reopened in the development container, open the `src/deployment/deploy.azcli` file in the editor. The script contains a `uniqueSuffix` variable that you should change to some other random number to avoid any naming collisions with other deployed instances of the solution.
+
+Next, open up `src/ClientApplication/Program.cs` and change the value of the `ENVIRONMENT_SUFFIX` constant to the same number you choose in the deployment script.
+
 ### Create Azure resources
 
-When the folder has reopened in the development container, open a new Terminal window in VS Code and navigate to the `src/deployment` folder.
+Open a new Terminal window in VS Code and navigate to the `src/deployment` folder.
 
 Use `az login` to log in to your Azure subscription.
 
@@ -41,7 +45,7 @@ VS Code will now restore, build and publish the solution, and upload the *Functi
 
 ### Deploy the front-end to Azure Storage Static Website
 
-Right-click the *ClientApplication/bin/Release/netstandard2.1/wwwroot* folder and select **Deploy to Static Website...**:
+Right-click the *ClientApplication/bin/Release/netstandard2.1/publish/wwwroot* folder and select **Deploy to Static Website...**:
 
 ![Deploy to Static Website](img/deploy-web.png)
 
@@ -49,5 +53,5 @@ VS Code will ask you again to select a subscription and then a storage account. 
 
 Once the front-end is deployed, VS Code will show the address at which the game can be played:
 
-![](img/browse.png)
+![Browse to website](img/browse.png)
 

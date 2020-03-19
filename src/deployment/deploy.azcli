@@ -2,7 +2,7 @@
 
 uniqueSuffix=1000
 
-resourceGroupName=ServerlessPoniesTestDeploy
+resourceGroupName=ServerlessPoniesSample
 location=WestEurope
 storageAccountName=serverlessponies$uniqueSuffix
 storageAccountKind=StorageV2

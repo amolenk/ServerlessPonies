@@ -1,18 +1,18 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using Amolenk.ServerlessPonies.ClientApplication;
 using Amolenk.ServerlessPonies.ClientApplication.Phaser;
 using Amolenk.ServerlessPonies.ClientApplication.Scenes;
 using Microsoft.AspNetCore.Components.WebAssembly.Hosting;
 using Microsoft.Extensions.Configuration;
-using Amolenk.ServerlessPonies.ClientApplication;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace ClientApplication
 {
     public class Program
     {
-        private const string ENVIRONMENT_SUFFIX = "9321";
+        private const string ENVIRONMENT_SUFFIX = "1000";
 
         public static Task Main(string[] args)
         {

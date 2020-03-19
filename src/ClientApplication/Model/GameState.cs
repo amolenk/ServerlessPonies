@@ -19,10 +19,6 @@ namespace Amolenk.ServerlessPonies.ClientApplication.Model
 
         public List<Enclosure> Enclosures { get; set; }
         
-        public event EventHandler<Animal> AnimalStateChanged;
-
-        public event EventHandler<Animal> AnimalPurchaseFailed;
-
         public Animal SelectedAnimal()
             => Animals.Find(animal => animal.Name == SelectedAnimalName);
 

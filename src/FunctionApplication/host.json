@@ -4,7 +4,6 @@
     "durableTask": {
       "hubName": "ServerlessPonies",
       "storageProvider": {
-        "connectionStringName": "DurableFunctionsStorageAccount",
         "maxQueuePollingInterval": "00:00:00.100",
         "partitionCount": 4
       },

@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 using Amolenk.ServerlessPonies.ClientApplication.Phaser;
 using Amolenk.ServerlessPonies.ClientApplication.Scenes;
-using Microsoft.AspNetCore.Blazor.Hosting;
+using Microsoft.AspNetCore.Components.WebAssembly.Hosting;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 
@@ -13,9 +13,11 @@ namespace ClientApplication
     {
         public static Task Main(string[] args)
         {
-            var builder = CreateHostBuilder(args);
+            var builder = WebAssemblyHostBuilder.CreateDefault(args);
+            builder.RootComponents.Add<App>("app");
 
             builder.Services
+                .AddBaseAddressHttpClient()
                 .AddTransient<IPhaserInterop, PhaserInterop>()
                 .AddTransient<ApiClient>()
                 .AddTransient<BootScene>()
@@ -26,16 +28,11 @@ namespace ClientApplication
 
             builder.Configuration.AddInMemoryCollection(new Dictionary<string, string>
             {
-                { "FunctionsBaseUrl", "https://serverlessponies.azurewebsites.net/" }
+                { "FunctionsBaseUrl", "https://serverlessponies9321.azurewebsites.net/" }
                 //{ "FunctionsBaseUrl", "http://localhost:7071/" }
             });
 
-            builder.RootComponents.Add<App>("app");
-
             return builder.Build().RunAsync();
         }
-
-        public static WebAssemblyHostBuilder CreateHostBuilder(string[] args) =>
-            WebAssemblyHostBuilder.CreateDefault();
     }
 }

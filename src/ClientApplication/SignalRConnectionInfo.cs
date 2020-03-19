@@ -1,5 +1,3 @@
-using Microsoft.AspNetCore.Blazor.Hosting;
-
 namespace ClientApplication
 {
     public class SignalRConnectionInfo

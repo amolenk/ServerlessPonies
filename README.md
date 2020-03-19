@@ -2,6 +2,8 @@
 
 This repo contains a work-in-progress game I'm building together with my 9 year-old daughter Lisa. It's a sample of how to create a serverless web application using Azure Functions on the server-side and Blazor WebAssembly on the client-side (hosted in an Azure Storage static website).
 
+> TODO Image + Video link
+
 ## Getting started
 
 This repository contains a VS Code `devcontainer.json` file which VS Code can use to create a sandbox that contains all the extensions required to deploy Serverless Ponies to Azure. 
@@ -55,3 +57,4 @@ Once the front-end is deployed, VS Code will show the address at which the game 
 
 ![Browse to website](img/browse.png)
 
+> Note that the first time you play the game, it'll take a little while to download the assets.

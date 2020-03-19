@@ -1,6 +1,6 @@
 #!/bin/bash
 
-uniqueSuffix=9321
+uniqueSuffix=1000
 
 resourceGroupName=ServerlessPoniesTestDeploy
 location=WestEurope
@@ -40,11 +40,12 @@ az functionapp create \
     -g $resourceGroupName \
     --consumption-plan-location $location \
     --runtime dotnet \
-    --runtime-version 3 \
+    --functions-version 3 \
     --storage-account $storageAccountId
 
 # Add a CORS allowed origin.
 storageAccountWebEndpoint=$(az storage account show -g $resourceGroupName -n $storageAccountName --query primaryEndpoints.web -o tsv)
+storageAccountWebEndpoint=${storageAccountWebEndpoint%?} # Strip trailing /
 #
 az functionapp cors add \
     -n $functionAppName \

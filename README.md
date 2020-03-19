@@ -2,7 +2,9 @@
 
 This repo contains a work-in-progress game I'm building together with my 9 year-old daughter Lisa. It's a sample of how to create a serverless web application using Azure Functions on the server-side and Blazor WebAssembly on the client-side (hosted in an Azure Storage static website).
 
-> TODO Image + Video link
+![Gameplay](img/game.png)
+
+To see the game in action and hear more about how it works, check out [this presentation](https://www.youtube.com/watch?v=n_o0np2UhIo) recorded at [dotnetdays.ro](https://dotnetdays.ro/) 2020.
 
 ## Getting started
 

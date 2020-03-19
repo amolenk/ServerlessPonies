@@ -14,7 +14,8 @@
 	"extensions": [
         "ms-azuretools.vscode-azurefunctions",
         "ms-azuretools.vscode-azurestorage",
-		"ms-dotnettools.csharp"
+        "ms-dotnettools.csharp",
+        "ms-vscode.azurecli"
 	]
 
 	// Use 'postCreateCommand' to run commands after the container is created.

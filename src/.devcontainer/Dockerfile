@@ -20,6 +20,13 @@ ARG USER_GID=$USER_UID
 RUN apt-get update \
     && apt-get -y install --no-install-recommends apt-utils dialog 2>&1 \
     #
+    # Install the Azure CLI
+    && apt-get install -y apt-transport-https curl gnupg2 lsb-release \
+    && echo "deb [arch=amd64] https://packages.microsoft.com/repos/azure-cli/ $(lsb_release -cs) main" > /etc/apt/sources.list.d/azure-cli.list \
+    && curl -sL https://packages.microsoft.com/keys/microsoft.asc | apt-key add - 2>/dev/null \
+    && apt-get update \
+    && apt-get install -y azure-cli \
+    #
     # Verify git and needed tools are installed
     && apt-get -y install \
         git \

@@ -1,4 +1,5 @@
 using Amolenk.ServerlessPonies.ClientApplication.Model;
+using Amolenk.ServerlessPonies.Messages;
 using ClientApplication;
 using Microsoft.JSInterop;
 using System;
@@ -21,9 +22,6 @@ namespace Amolenk.ServerlessPonies.ClientApplication.Scenes
         [JSInvokable("create")]
         public override void Create()
         {
-            Phaser(interop => interop.AddSprite("sprLogo", "misc/logo", 640, 512));
-
-            _apiClient.StartSinglePlayerGameAsync(Guid.NewGuid().ToString("N"), StateManager.PlayerName);
         }
 
         protected override void WireStateHandlers(GameState state)
@@ -31,6 +29,8 @@ namespace Amolenk.ServerlessPonies.ClientApplication.Scenes
             // FIX Double check GameName as well?
             if (StateManager.State.IsStarted)
             {
+                Console.WriteLine("Boot: IsStarted");
+
                 Phaser(interop => interop
                     .StartScene(CreditsScene.Name)
                     .SwitchToScene(RanchScene.Name));

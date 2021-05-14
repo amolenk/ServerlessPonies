@@ -1,24 +1,35 @@
 using Amolenk.ServerlessPonies.Messages;
-using Microsoft.JSInterop;
 using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Net.Http;
-using System.Text;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Components;
 using Microsoft.Extensions.Configuration;
+using Newtonsoft.Json.Linq;
+using Microsoft.Extensions.Logging;
 
 namespace Amolenk.ServerlessPonies.ClientApplication
 {
     public class ApiClient
     {
         private readonly HttpClient _client;
+        private readonly ILogger<ApiClient> _logger;
 
-        public ApiClient(HttpClient client, IConfiguration configuration)
+        public ApiClient(HttpClient client, IConfiguration configuration, ILogger<ApiClient> logger)
         {
             _client = client;
             _client.BaseAddress = new Uri(configuration.GetValue<string>("FunctionsBaseUrl"));
+            _logger = logger;
+        }
+
+        public async Task<Uri> LoginAsync(string playerName)
+        {
+            var response = await _client.GetAsync($"/api/login/{playerName}");
+            var result = await response.Content.ReadAsStringAsync();
+            var connectionInfo = JObject.Parse(result);
+
+            _logger.LogInformation("Logged in!");
+
+            return new Uri(connectionInfo["url"].Value<string>());
         }
 
         public Task StartSinglePlayerGameAsync(string gameName, string playerName)

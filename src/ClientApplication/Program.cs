@@ -22,7 +22,8 @@ namespace ClientApplication
             builder.Services
                 .AddBaseAddressHttpClient()
                 .AddTransient<IPhaserInterop, PhaserInterop>()
-                .AddTransient<ApiClient>()
+                .AddSingleton<ApiClient>()
+                .AddSingleton<GameServer>()
                 .AddTransient<BootScene>()
                 .AddTransient<CreditsScene>()
                 .AddTransient<RanchScene>()
@@ -31,7 +32,8 @@ namespace ClientApplication
 
             builder.Configuration.AddInMemoryCollection(new Dictionary<string, string>
             {
-                { "FunctionsBaseUrl", $"https://serverlessponies{ENVIRONMENT_SUFFIX}.azurewebsites.net/" }
+                { "FunctionsBaseUrl", $"http://localhost:7071/" }
+//                { "FunctionsBaseUrl", $"https://serverlessponies{ENVIRONMENT_SUFFIX}.azurewebsites.net/" }
             });
 
             return builder.Build().RunAsync();

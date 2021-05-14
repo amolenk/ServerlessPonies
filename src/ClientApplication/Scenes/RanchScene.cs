@@ -32,6 +32,8 @@ namespace Amolenk.ServerlessPonies.ClientApplication.Scenes
         [JSInvokable("create")]
         public override void Create()
         {
+            Console.WriteLine("RanchScene.Create");
+
             Phaser(interop =>
             {
                 interop

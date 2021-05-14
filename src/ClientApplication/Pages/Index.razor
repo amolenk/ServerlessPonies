@@ -1,25 +1,160 @@
 ﻿@page "/"
 
-@inject NavigationManager NavigationManager
+@using Amolenk.ServerlessPonies.ClientApplication
+@using Amolenk.ServerlessPonies.ClientApplication.Handlers
+@using Amolenk.ServerlessPonies.ClientApplication.Model
+@using Amolenk.ServerlessPonies.ClientApplication.Phaser
+@using Amolenk.ServerlessPonies.ClientApplication.Scenes
+@using Amolenk.ServerlessPonies.Messages
+@using Microsoft.Extensions.Configuration
+@using Newtonsoft.Json.Linq
 
-<div id="form-container">
-    <h1>Serverless Ponies BETA</h1>
+@inject GameServer GameServer
+@inject IConfiguration Configuration
+@inject IPhaserInterop Phaser;
+@inject IServiceProvider ServiceProvider;
+
+<div id="phaser-container"></div>
+
+<div id="form-container" hidden="@(_startGameStep >= StartGameStep.Starting)">
+    <h1>Serverless Ponies DEMO</h1>
 
     <img src="assets/logo.png" />
 
-    <p>
-        <input placeholder="player name" @bind="_playerName" />
+    <p hidden="@(_startGameStep > StartGameStep.Preloading)">
+        loading assets...
     </p>
 
-    <span><button @onclick="StartSinglePlayerGame">Start Single Player Game</button> <button disabled>Start Multiplayer Game</button></span>
+    <p hidden="@(_startGameStep < StartGameStep.Preloaded)">
+        <input placeholder="player name" @bind="_stateManager.PlayerName" disabled="@(_startGameStep != StartGameStep.Preloaded)" />
+    </p>
+
+    <p hidden="@(_startGameStep < StartGameStep.LoggedIn)">
+        <input @bind="_gameSessionId" disabled="@(_startGameStep != StartGameStep.LoggedIn)" />
+        <p>@_playerCount player(s)</p>
+    </p>
+
+    <span>
+        <button @onclick="LoginAsync" hidden="@(_startGameStep != StartGameStep.Preloaded)">Login</button>
+        <button @onclick="JoinAsync" hidden="@(_startGameStep != StartGameStep.LoggedIn)">Join</button>
+        <button @onclick="StartAsync" hidden="@(_startGameStep != StartGameStep.Joined)">Start</button>
+    </span>
 </div>
 
 @code {
 
-    private string _playerName;
+    private StartGameStep _startGameStep = StartGameStep.Preloading;
+    private StateManager _stateManager;
+    private PhaserGame _phaserGame;
+    private string _gameSessionId;
+    private int _playerCount;
 
-    private void StartSinglePlayerGame()
+    protected override void OnInitialized()
     {
-        NavigationManager.NavigateTo($"game/{_playerName}");
+        _stateManager = new StateManager();
+    }
+
+    protected override void OnAfterRender(bool firstRender)
+    {
+        if (firstRender)
+        {
+            var animalEventHandler = new AnimalEventHandler();
+            var playerEventHandler = new PlayerEventHandler();
+
+            _phaserGame = new PhaserGameBuilder(Phaser, ServiceProvider)
+                .WithPreloadCompletedHandler(OnPreloadCompleted)
+                .WithStateManager(_stateManager)
+                .WithGameServer(GameServer)
+                .WithScene<BootScene>()
+                .WithScene<RanchScene>()
+                .WithScene<AnimalCareScene>()
+                .WithScene<AnimalManagementScene>()
+                .WithScene<CreditsScene>()
+                .WithEventHandler<GameStartedEvent>(new GameStartedEventHandler())
+                .WithEventHandler<AnimalMoodChangedEvent>(animalEventHandler)
+                .WithEventHandler<AnimalMovedEvent>(animalEventHandler)
+                .WithEventHandler<AnimalPurchasedEvent>(animalEventHandler)
+                .WithEventHandler<AnimalPurchaseFailedEvent>(animalEventHandler)
+                .WithEventHandler<CreditsChangedEvent>(playerEventHandler)
+                .Build();
+
+            _phaserGame.Start("phaser-container", "Serverless Ponies BETA 🐴");
+        }
+    }
+
+    private void OnPreloadCompleted()
+    {
+        _startGameStep = StartGameStep.Preloaded;
+        StateHasChanged();
+    }
+
+    private async Task LoginAsync()
+    {
+        if (!string.IsNullOrEmpty(_stateManager.PlayerName))
+        {
+            _startGameStep = StartGameStep.LoggingIn;
+
+            await GameServer.LoginAsync(_stateManager.PlayerName, HandleMessage);
+        }
+    }
+
+    private async Task JoinAsync()
+    {
+        _startGameStep = StartGameStep.Joining;
+
+        await GameServer.JoinAsync(_gameSessionId);
+    }
+
+    private async Task StartAsync()
+    {
+        _startGameStep = StartGameStep.Starting;
+
+        await GameServer.StartAsync(_gameSessionId);
+    }
+
+    private void HandleMessage(JObject message)
+    {
+        if (message["type"].Value<string>() == "system"
+            && message["event"].Value<string>() == "connected"
+            && _startGameStep == StartGameStep.LoggingIn)
+        {
+            _gameSessionId = new Random().Next(100000, 1000000).ToString();
+            _startGameStep = StartGameStep.LoggedIn;
+            StateHasChanged();
+        }
+        else if (message["type"].Value<string>() == "message"
+            && message["from"].Value<string>() == "group"
+            && message["group"].Value<string>() == _gameSessionId)
+        {
+            var eventType = Type.GetType($"Amolenk.ServerlessPonies.Messages.{message["data"]["eventType"]}, Messages");
+            var eventMessage = message["data"]["eventBody"].ToObject(eventType);
+
+            HandleEventMessage(eventMessage);
+        }
+    }
+
+    private void HandleEventMessage(object eventMessage)
+    {
+        if (eventMessage is PlayerJoinedEvent playedJoinedEvent)
+        {
+            if (_startGameStep == StartGameStep.Joining
+                && playedJoinedEvent.Players.Any(p => p.Name == _stateManager.PlayerName))
+            {
+                _startGameStep = StartGameStep.Joined;
+            }
+
+            _playerCount = playedJoinedEvent.Players.Count;
+            StateHasChanged();
+        }
+        else if (eventMessage is GameStartedEvent gameStartedEvent)
+        {
+            if (_startGameStep == StartGameStep.Starting)
+            {
+                _startGameStep = StartGameStep.Started;
+                StateHasChanged();
+            }
+        }
+
+        _phaserGame.HandleEvent(eventMessage);
     }
 }

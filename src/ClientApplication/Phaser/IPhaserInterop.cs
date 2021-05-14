@@ -12,7 +12,7 @@ namespace Amolenk.ServerlessPonies.ClientApplication.Phaser
     {
         void RegisterScene(Scene scene);
 
-        void Start(string containerElement, string title);
+        void Start(string containerElement, string title, PhaserGame game);
 
         IPhaserSceneInterop Scene(Scene scene);
     }

@@ -198,18 +198,36 @@ function shakeCamera(scene) {
 
 function registerScene(name, dotNetScene) {
 
+    console.log('registerScene: ' + name);
+
     var phaserScene = new Phaser.Scene(name);
     sceneInfos[name] = {
         phaserScene: phaserScene,
         dotNetScene: dotNetScene
     };
 
-    // TODO Use pack instead of hard coded: https://phaser.io/examples/v3/view/scenes/swapping-scenes
-    phaserScene.preload = function () {
-        this.load.image('particle-white', './assets/white.png');
-        this.load.image('particle-yellow', './assets/yellow.png');
-        this.load.atlas("sprites", './assets/sprites.png', './assets/sprites.json');
-    };
+    if (!preloadInjected) {
+        phaserScene.preload = function () {
+
+            this.load.on('complete', function () {
+                dotNetGame.invokeMethod('onPreloadCompleted');
+            });
+
+            this.load.image('particle-white', './assets/white.png');
+            this.load.image('particle-yellow', './assets/yellow.png');
+            this.load.atlas("sprites", './assets/sprites.png', './assets/sprites.json');
+        };
+        preloadInjected = true;
+    }
+    else
+    {
+        phaserScene.preload = function () {
+
+            this.load.image('particle-white', './assets/white.png');
+            this.load.image('particle-yellow', './assets/yellow.png');
+            this.load.atlas("sprites", './assets/sprites.png', './assets/sprites.json');
+        };
+    }
 
     phaserScene.create = function () {
 
@@ -221,8 +239,14 @@ function registerScene(name, dotNetScene) {
 }
 
 let game;
+let dotNetGame;
+let preloadInjected;
 
-function startPhaser(container, title) {
+function startPhaser(container, title, dotNetPhaserGame) {
+
+    dotNetGame = dotNetPhaserGame;
+
+    console.log('container = ' + container);
 
     const config = {
         type: Phaser.AUTO,

@@ -1,22 +1,27 @@
+using System;
 using System.Linq;
+using System.Text.Json;
 using System.Threading.Tasks;
 using Amolenk.ServerlessPonies.FunctionApplication.Model;
 using Amolenk.ServerlessPonies.Messages;
 using Microsoft.Azure.WebJobs;
 using Microsoft.Azure.WebJobs.Extensions.DurableTask;
 using Microsoft.Azure.WebJobs.Extensions.SignalRService;
+using Microsoft.Azure.WebJobs.Extensions.WebPubSub;
 using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
+using Newtonsoft.Json.Serialization;
 
 namespace Amolenk.ServerlessPonies.FunctionApplication.Entities
 {
     [JsonObject(MemberSerialization.OptIn)]
     public class GameSession : IGameSession
     {
-        private readonly IAsyncCollector<SignalRMessage> _signalRMessages;
+        private readonly IAsyncCollector<WebPubSubOperation> _operations;
 
-        public GameSession(IAsyncCollector<SignalRMessage> signalRMessages)
+        public GameSession(IAsyncCollector<WebPubSubOperation> operations)
         {
-            _signalRMessages = signalRMessages;
+            _operations = operations;
 
             this.PlayerStates = new PlayerStateCollection();
             this.AnimalStates = new AnimalStateCollection();
@@ -31,10 +36,25 @@ namespace Amolenk.ServerlessPonies.FunctionApplication.Entities
         [JsonProperty]
         public AnimalStateCollection AnimalStates { get; set; }
 
-        public Task StartSinglePlayer(string playerName)
+        public Task JoinAsync(string playerName)
         {
             AddPlayer(playerName);
 
+            return PublishEventAsync(new PlayerJoinedEvent
+            {
+                GameSessionId = Entity.Current.EntityKey,
+                Players = PlayerStates
+                    .Select(player => new Messages.PlayerState
+                    {
+                        Name = player.Name,
+                        Credits = player.Credits
+                    })
+                    .ToList()
+            });
+        }
+
+        public Task StartAsync()
+        {
             IsStarted = true;
             AnimalStates = AnimalStateCollection.InitialGameState();
 
@@ -148,19 +168,28 @@ namespace Amolenk.ServerlessPonies.FunctionApplication.Entities
             PlayerStates.Add(playerState);
         }
 
-        private Task PublishEventAsync<T>(T @event)
+        private Task PublishEventAsync<T>(T message)
         {
-            return _signalRMessages.AddAsync(new SignalRMessage
-                {
-                    GroupName = Entity.Current.EntityKey,
-                    Target = "HandleMessage",
-                    Arguments = new object[] { typeof(T).Name, @event }
-                });
+            var jsonOptions = new JsonSerializerOptions();
+            jsonOptions.PropertyNamingPolicy = JsonNamingPolicy.CamelCase;
+
+            var envelope = new EventEnvelope
+            {
+                EventType = typeof(T).Name,
+                EventBody = message
+            };
+
+            return _operations.AddAsync(new SendToGroup
+            {
+                Group = Entity.Current.EntityKey,
+                DataType = MessageDataType.Json,
+                Message = BinaryData.FromObjectAsJson(envelope, jsonOptions)
+            });
         }
 
         [FunctionName(nameof(GameSession))]
         public static Task Run([EntityTrigger] IDurableEntityContext ctx,
-            [SignalR(HubName = "ponies")] IAsyncCollector<SignalRMessage> signalRMessages)
-            => ctx.DispatchAsync<GameSession>(signalRMessages);
+            [WebPubSub(Hub = "ponies")] IAsyncCollector<WebPubSubOperation> operations)
+            => ctx.DispatchAsync<GameSession>(operations);
     }
 }

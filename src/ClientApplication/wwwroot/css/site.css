@@ -16,12 +16,15 @@ button {
 }
 
 #form-container {
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
+    position:absolute;
+    width:400px;
+    top: 50%;
+    left: 50%;
+    margin-left: -200px;
+    margin-top: -200px;
+    z-index: 99;
     align-items: center;
     text-align: center;
-    min-height: 100vh;
 }
 
 #phaser-container {

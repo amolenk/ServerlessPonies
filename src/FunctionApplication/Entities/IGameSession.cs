@@ -5,7 +5,9 @@ namespace Amolenk.ServerlessPonies.FunctionApplication.Entities
 {
     public interface IGameSession
     {
-        Task StartSinglePlayer(string playerName);
+        Task JoinAsync(string playerName);
+
+        Task StartAsync();
 
         Task PurchaseAnimalAsync(AnimalPurchase purchase);
 

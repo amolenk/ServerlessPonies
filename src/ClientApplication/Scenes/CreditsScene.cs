@@ -1,3 +1,4 @@
+using System;
 using Amolenk.ServerlessPonies.ClientApplication.Model;
 using Microsoft.JSInterop;
 
@@ -12,7 +13,11 @@ namespace Amolenk.ServerlessPonies.ClientApplication.Scenes
         [JSInvokable("create")]
         public override void Create()
         {
+            Console.WriteLine("CreditsScene:Create");
+
             var player = StateManager.State.FindPlayer(StateManager.PlayerName);
+
+            Console.WriteLine("CreditsScene:Player:" + player);
 
             Phaser(interop => interop
                 .AddSprite("sprCreditsBg", "misc/board", 1100, 60)

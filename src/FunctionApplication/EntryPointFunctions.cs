@@ -1,3 +1,4 @@
+using System;
 using System.Threading.Tasks;
 using Amolenk.ServerlessPonies.FunctionApplication.Entities;
 using Amolenk.ServerlessPonies.FunctionApplication.Model;
@@ -6,37 +7,64 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.Azure.WebJobs;
 using Microsoft.Azure.WebJobs.Extensions.DurableTask;
 using Microsoft.Azure.WebJobs.Extensions.Http;
-using Microsoft.Azure.WebJobs.Extensions.SignalRService;
+using Microsoft.Azure.WebJobs.Extensions.WebPubSub;
+using Newtonsoft.Json;
 
 namespace Amolenk.ServerlessPonies.FunctionApplication
 {
     public class EntryPointFunctions
     {
-        // When the client app opens, it requires valid connection credentials to connect to the
-        // Azure SignalR service. This function will return the connection information.
-        [FunctionName("GetSignalRInfo")]
-        public static SignalRConnectionInfo GetSignalRInfo(
-            [HttpTrigger(AuthorizationLevel.Anonymous, "POST", Route = "signalr/{userId}/negotiate")] HttpRequest req,
-            [SignalRConnectionInfo(HubName = "ponies", UserId = "{userId}")] SignalRConnectionInfo connectionInfo)
-            => connectionInfo;
+        [FunctionName("Login")]
+        public static WebPubSubConnection Login(
+            [HttpTrigger(AuthorizationLevel.Anonymous, "GET", Route = "login/{userId}")] HttpRequest req,
+            [WebPubSubConnection(Hub = "ponies", UserId = "{userId}")] WebPubSubConnection connection)
+            => connection;
 
-        [FunctionName("StartSinglePlayerGame")]
-        public static async Task StartSinglePlayerGame(
-            [HttpTrigger(AuthorizationLevel.Anonymous, "POST", Route = "game/{gameName}/start")] StartSinglePlayerGameCommand command,
+        [FunctionName("Join")]
+        public static async Task JoinGameSession(
+            [WebPubSubTrigger("ponies", WebPubSubEventType.User, "join")]
+            ConnectionContext context,
+            BinaryData message,
+            MessageDataType dataType,
             [DurableClient] IDurableEntityClient client,
-            [SignalR(HubName = "ponies")] IAsyncCollector<SignalRGroupAction> signalRGroupActions,
-            string gameName)
+            [WebPubSub(Hub = "ponies")] IAsyncCollector<WebPubSubOperation> operations)
         {
-            await signalRGroupActions.AddAsync(new SignalRGroupAction
+            var command = JsonConvert.DeserializeObject<JoinGameSessionCommand>(message.ToString());
+            var gameSessionId = command.GameSessionId;
+
+            await operations.AddAsync(new AddUserToGroup
             {
-                UserId = command.PlayerName,
-                GroupName = gameName,
-                Action = GroupAction.Add
+                UserId = context.UserId,
+                Group = gameSessionId
             });
 
-            var entityId = new EntityId(nameof(GameSession), gameName);
-            await client.SignalEntityAsync<IGameSession>(entityId, proxy => proxy.StartSinglePlayer(command.PlayerName));
+            var entityId = new EntityId(nameof(GameSession), gameSessionId);
+            await client.SignalEntityAsync<IGameSession>(entityId, proxy => proxy.JoinAsync(context.UserId));
         }
+
+        [FunctionName("Start")]
+        public static async Task StartGameSession(
+            [WebPubSubTrigger("ponies", WebPubSubEventType.User, "start")]
+            ConnectionContext context,
+            BinaryData message,
+            MessageDataType dataType,
+            [DurableClient] IDurableEntityClient client)
+        {
+            var command = JsonConvert.DeserializeObject<StartGameSessionCommand>(message.ToString());
+
+            var entityId = new EntityId(nameof(GameSession), command.GameSessionId);
+            await client.SignalEntityAsync<IGameSession>(entityId, proxy => proxy.StartAsync());
+        }
+
+        [FunctionName("Ping")]
+        public static void Ping(
+            [WebPubSubTrigger("ponies", WebPubSubEventType.User, "ping")]
+            ConnectionContext context,
+            BinaryData message,
+            MessageDataType dataType)
+        {
+        }
+
 
         [FunctionName("PurchaseAnimal")]
         public static Task PurchaseAnimal(

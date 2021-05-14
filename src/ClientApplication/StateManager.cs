@@ -7,13 +7,8 @@ namespace Amolenk.ServerlessPonies.ClientApplication
     public class StateManager : IStateManager
     {
         private GameState _state;
-        
-        public StateManager(string playerName)
-        {
-            PlayerName = playerName;
-        }
 
-        public string PlayerName { get; }
+        public string PlayerName { get; set; }
 
         public event EventHandler GameStateChanged;
 

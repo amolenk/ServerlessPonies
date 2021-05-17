@@ -253,7 +253,9 @@ function startPhaser(container, title, dotNetPhaserGame) {
         scale: {
             parent: container,
             width: 1280,
-            height: 1024
+            height: 1024,
+            mode: Phaser.Scale.FIT,
+            autoCenter: Phaser.Scale.CENTER_BOTH,
         },
         scene: Object.keys(sceneInfos).map(key => sceneInfos[key].phaserScene),
         title: title

@@ -1,6 +1,6 @@
 #!/bin/bash
 
-uniqueSuffix=1000
+uniqueSuffix=1805
 
 resourceGroupName=ServerlessPoniesSample
 location=WestEurope

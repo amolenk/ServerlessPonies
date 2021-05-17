@@ -148,7 +148,7 @@
         }
         else if (eventMessage is GameStartedEvent gameStartedEvent)
         {
-            if (_startGameStep == StartGameStep.Starting)
+            if (_startGameStep >= StartGameStep.Joined)
             {
                 _startGameStep = StartGameStep.Started;
                 StateHasChanged();

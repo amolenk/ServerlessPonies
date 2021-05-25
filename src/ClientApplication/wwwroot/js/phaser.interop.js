@@ -250,12 +250,12 @@ function startPhaser(container, title, dotNetPhaserGame) {
 
     const config = {
         type: Phaser.AUTO,
+        parent: container,
+        width: 1280,
+        height: 1024,
         scale: {
-            parent: container,
-            width: 1280,
-            height: 1024,
             mode: Phaser.Scale.FIT,
-            autoCenter: Phaser.Scale.CENTER_BOTH,
+            autoCenter: Phaser.Scale.CENTER_BOTH
         },
         scene: Object.keys(sceneInfos).map(key => sceneInfos[key].phaserScene),
         title: title

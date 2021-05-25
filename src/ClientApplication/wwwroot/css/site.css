@@ -15,6 +15,10 @@ button {
     font-size: 20px;
 }
 
+.main {
+    height: 100%;
+}
+
 #form-container {
     position:absolute;
     width:400px;
@@ -28,7 +32,7 @@ button {
 }
 
 #phaser-container {
-    min-height: 100vh;
+    height: 100%;
 }
 
 #blazor-error-ui {
